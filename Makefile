@@ -3,7 +3,7 @@ COMPOSE = docker compose
 all: up
 
 # empty .env are allowed, but they must exist
-up: check-env
+up: check-env tls
 	$(COMPOSE) up -d --build
 
 down:
@@ -23,7 +23,10 @@ check-env:
 		fi; \
 	done
 
+tls:
+	@echo "Generating TLS certificates..."
+	@bash ./server/certificates/generate.sh
 
-re: fclean up
+re: down up
 
 .PHONY: all up down clean fclean re check-env

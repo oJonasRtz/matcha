@@ -3,9 +3,11 @@ services:
     image: httpd:latest
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./server/httpd.conf:/usr/local/apache2/conf/httpd.conf
       - ./server/vhosts.conf:/usr/local/apache2/conf/extra/vhosts.conf
+      - ./server/certificates:/usr/local/apache2/conf/ssl
     depends_on:
       - frontend
       - backend
