@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS profile_views (
+	id SERIAL PRIMARY KEY,
+	viewer_id INTEGER NOT NULL,
+	viewed_id INTEGER NOT NULL,
+	viewed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY (viewer_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (viewed_id) REFERENCES users(id) ON DELETE CASCADE,
+
+	UNIQUE (viewer_id, viewed_id)
+);

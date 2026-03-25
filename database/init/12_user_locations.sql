@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS user_locations (
+	user_id INTEGER PRIMARY KEY,
+	latitude DOUBLE PRECISION NOT NULL,
+	longitude DOUBLE PRECISION NOT NULL,
+	address TEXT,
+
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
