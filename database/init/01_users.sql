@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS users (
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
 	gender VARCHAR(50) NOT NULL,
-	sexual_orientation VARCHAR(50) NOT NULL,
-	bio TEXT,
+	sexual_orientation VARCHAR(50) NOT NULL DEFAULT 'bisexual',
+	bio TEXT DEFAULT '',
 	age INTEGER NOT NULL,
-	frame_rate INTEGER NOT NULL,
+	frame_rate INTEGER NOT NULL DEFAULT 0,
 	is_online BOOLEAN NOT NULL DEFAULT FALSE,
 	last_online TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
