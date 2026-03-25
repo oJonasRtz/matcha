@@ -1,0 +1,90 @@
+## Instalation
+
+Deixe a instalação em uma pasta onde já sabes que desejas
+
+O Biome é melhor que o ESLint por conta que é mais completo e moderno
+
+npx create-next-app@latest frontend
+
+npx create-next-app@latest frontend
+✔ Would you like to use the recommended Next.js defaults? › No, customize settings
+✔ Would you like to use TypeScript? … No / Yes
+✔ Which linter would you like to use? › Biome
+✔ Would you like to use React Compiler? … No / Yes
+✔ Would you like to use Tailwind CSS? … No / Yes
+✔ Would you like your code inside a `src/` directory? … No / Yes
+✔ Would you like to use App Router? (recommended) … No / Yes
+✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes
+✔ What import alias would you like configured? … @/*
+✔ Would you like to include AGENTS.md to guide coding agents to write up-to-date Next.js code? … No / Yes
+Creating a new Next.js app in /home/fruan-ba/linkedinLab/matcha/frontend/frontend.
+
+Using npm.
+
+Initializing project with template: app-tw
+
+
+Installing dependencies:
+- next
+- react
+- react-dom
+
+Installing devDependencies:
+- @biomejs/biome
+- @tailwindcss/postcss
+- @types/node
+- @types/react
+- @types/react-dom
+- babel-plugin-react-compiler
+- tailwindcss
+- typescript
+
+## Como rodar?
+
+npm run dev
+
+## Como funciona?
+
+No app/ fica as páginas
+page.tsx representa uma rota como / na raíz
+em uma pasta como /login ter um page.tsx indica a rota /login
+Ou seja, o que indica a rota é a presença do page.tsx
+
+E o componente? É uma pasta na raíz que decide o que será carregado naquela UDL
+Ou seja, na pasta de components eu posso ter subdiretórios para organizar funcionalidades do meu site como auth, chat e etc
+
+Os componentes são as partes reutilizáveis, eu posso pegar o que
+tem neles e colocar onde eu quiser
+
+E como funciona? Na page.tsx, cubra com a main e ponha os
+componentes logo abaixo como
+
+import "../components/auth/LoginForm";
+
+return (
+	<main>
+		<LoginForm/>
+	</main>
+);
+
+É assim que funciona e podemos reutilizar as coisas
+
+<main className="min-h-screen flex items-center justify-center">
+
+É assim que colocamos um tailwindcss para estilizar a página e fazemos isso na page.tsx
+
+## Coloca plano de fundo
+
+import Image from "next/image";
+import LoginForm from "../components/auth/LoginForm"
+
+export default function Home() {
+  return (
+        <main className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('/images/loginImage.jpg" }}
+        >
+                <LoginForm /> 
+        </main>
+  );
+}
+
