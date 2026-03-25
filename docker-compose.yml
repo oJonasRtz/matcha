@@ -11,12 +11,20 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - default
 
   #Note: expose only for tests, not for production
   frontend:
     build: ./frontend
+    environment:
+      - NODE_EXTRA_CA_CERTS=/app/ssl/server.cert
+    volumes:
+      - ./server/certificates:/app/ssl:ro
     expose:
       - "3000"
+    networks:
+      - default
 
   backend:
     build: ./backend
@@ -24,7 +32,27 @@ services:
       - ./server/certificates:/certificates
     expose:
       - "5000"
+    ports:
+      - "5000:5000"
+    networks:
+      - default
+      - db_network
+  
+  database:
+    image: postgres:latest
+    networks:
+      - db_network
+    volumes:
+      - db_data:/var/lib/postgresql #persist data
+      - ./database/init:/docker-entrypoint-initdb.d
+    env_file:
+      - ./database/.env
+
+volumes:
+  db_data: #persist data in /var/lib/docker/volumes/
 
 networks:
+  db_network:
+    driver: bridge
   default:
     driver: bridge
