@@ -15,6 +15,10 @@ services:
   #Note: expose only for tests, not for production
   frontend:
     build: ./frontend
+    environment:
+      - NODE_EXTRA_CA_CERTS=/app/ssl/server.cert
+    volumes:
+      - ./server/certificates:/app/ssl:ro
     expose:
       - "3000"
 
