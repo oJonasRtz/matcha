@@ -17,8 +17,8 @@ class Server:
     
     def _set_error_handlers(self):
         @self.app.errorhandler(413)
-        def handle_file_too_large(e):
-            return jsonify({"error": "File is too large. Maximum size is 10 MB"}), 413
+        def handle_file_too_large():
+            return jsonify({"error": f"File is too large. Maximum size is {self.app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)} MB"}), 413
     
     def run(self, host="", port=5000, ssl_context=None):
         self.app.run(host=host, port=port, ssl_context=ssl_context)
