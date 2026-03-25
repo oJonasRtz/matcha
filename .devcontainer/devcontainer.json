@@ -23,7 +23,12 @@
         "mrmlnc.vscode-apache",
 
         "eamodio.gitlens",
-        "usernamehw.errorlens"
+        "usernamehw.errorlens",
+
+        // PostgreSQL
+        "ms-azuretools.vscode-postgresql",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
       ]
     }
   }
