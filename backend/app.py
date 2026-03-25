@@ -1,9 +1,11 @@
 from flask import Flask, jsonify
 from werkzeug.exceptions import RequestEntityTooLarge
 from src.loadRoutes import load_routes
+from checkApiKey import init_app
 
 app = Flask(__name__)
 
+init_app(app)
 
 #upload limits
 limit = 10  #in MB
