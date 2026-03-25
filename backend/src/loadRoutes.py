@@ -1,5 +1,6 @@
 from flask import Flask
 from src.endpoints.health import health
+from src.endpoints.getInfo import get_info
 
 def load_routes(app):
 	if not isinstance(app, Flask):
@@ -7,6 +8,7 @@ def load_routes(app):
 
 	# {'/endpoint', function, methods=['GET', 'POST'], function_name='endpoint_function'}
 	routes = [
+		('/getInfo', get_info, ["GET"], "get_info"),
 		("/health", health, ["GET"], "health")
 	]
  
