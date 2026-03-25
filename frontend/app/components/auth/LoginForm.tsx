@@ -1,0 +1,91 @@
+import Link from "next/link";
+
+export default function LoginForm() {
+  return (
+    <section className="w-full max-w-md rounded-2xl bg-white/10 backdrop-blur-lg border border-white/30 p-8 shadow-2xl">
+      <h1 className="mb-6 text-center text-white text-3xl font-bold">Login</h1>
+
+      <form className="flex flex-col gap-6">
+        <div className="relative">
+          <input
+            id="identity"
+            name="identity"
+            type="text"
+            placeholder=" "
+            className="peer w-full text-black rounded-xl border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            required
+          />
+          <label
+            htmlFor="identity"
+            className="pointer-events-none absolute left-4 top-4 px-1 text-sm font-semibold text-gray-400 transition-all
+                       peer-placeholder-shown:top-4
+                       peer-placeholder-shown:text-base
+                       peer-placeholder-shown:font-bold
+                       peer-focus:top-1
+                       peer-focus:text-sm
+                       peer-focus:font-bold
+                       peer-focus:text-red-500"
+          >
+            Email or username
+          </label>
+        </div>
+
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder=" "
+            className="peer w-full rounded-xl text-black border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
+            required
+          />
+          <label
+            htmlFor="password"
+            className="pointer-events-none absolute left-4 top-4 px-1 text-sm font-semibold text-gray-400 transition-all
+                       peer-placeholder-shown:top-4
+                       peer-placeholder-shown:text-base
+                       peer-placeholder-shown:font-bold
+                       peer-focus:top-1
+                       peer-focus:text-sm
+                       peer-focus:font-bold
+                       peer-focus:text-red-500"
+          >
+            Password
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          className="rounded-xl bg-blue-500 px-4 py-3 font-semibold text-white transition hover:bg-blue-600"
+        >
+          Submit
+        </button>
+      </form>
+      <div className="mt-5 flex flex-col items-center gap-3 text-sm">
+        <Link
+          href="#"
+          className="text-white/80 transition hover:text-blue-300 hover:underline"
+        >
+          <strong>Forgot password?</strong>
+        </Link>
+
+        <Link
+          href="#"
+          className="font-semibold text-white transition hover:text-blue-300 hover:underline"
+        >
+          <strong>Create new account</strong>
+        </Link>
+      </div>
+      <footer className="mt-8 border-t border-white/20 pt-4">
+        <div className="flex justify-center gap-4 text-xs text-white/70">
+          <Link href="#" className="transition hover:text-blue-300 hover:underline">
+            <strong>Terms of Service</strong>
+          </Link>
+          <Link href="#" className="transition hover:text-blue-300 hover:underline">
+            <strong>Privacy Policy</strong>
+          </Link>
+        </div>
+      </footer>
+    </section>
+  );
+}
