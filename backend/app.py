@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from werkzeug.exceptions import RequestEntityTooLarge
 from src.loadRoutes import load_routes
 
 app = Flask(__name__)
+
 
 #upload limits
 limit = 10  #in MB
