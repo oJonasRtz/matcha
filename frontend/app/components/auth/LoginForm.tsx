@@ -12,22 +12,27 @@ export default function LoginForm() {
             name="identity"
             type="text"
             placeholder=" "
-            className="peer w-full text-black rounded-xl border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="peer w-full text-gray rounded-xl border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
             required
           />
-          <label
-            htmlFor="identity"
-            className="pointer-events-none absolute left-4 top-4 px-1 text-sm font-semibold text-gray-400 transition-all
-                       peer-placeholder-shown:top-4
-                       peer-placeholder-shown:text-base
-                       peer-placeholder-shown:font-bold
-                       peer-focus:top-1
-                       peer-focus:text-sm
-                       peer-focus:font-bold
-                       peer-focus:text-red-500"
-          >
-            Email or username
-          </label>
+	<label
+    	     htmlFor="identity"
+    	     className="pointer-events-none absolute left-4
+      		top-2 translate-y-0
+      		text-sm font-semibold text-gray-400
+      		transition-all duration-200
+
+      		peer-placeholder-shown:top-1/2
+      		peer-placeholder-shown:-translate-y-1/2
+      		peer-placeholder-shown:text-base
+
+      		peer-focus:top-2
+      		peer-focus:translate-y-0
+      		peer-focus:text-sm
+      		peer-focus:text-red-500"
+  	>
+    		Email or username
+  	</label>
         </div>
 
         <div className="relative">
@@ -36,19 +41,24 @@ export default function LoginForm() {
             name="password"
             type="password"
             placeholder=" "
-            className="peer w-full rounded-xl text-black border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
+            className="peer w-full rounded-xl text-gray border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
             required
           />
           <label
             htmlFor="password"
-            className="pointer-events-none absolute left-4 top-4 px-1 text-sm font-semibold text-gray-400 transition-all
-                       peer-placeholder-shown:top-4
-                       peer-placeholder-shown:text-base
-                       peer-placeholder-shown:font-bold
-                       peer-focus:top-1
-                       peer-focus:text-sm
-                       peer-focus:font-bold
-                       peer-focus:text-red-500"
+		className="pointer-events-none absolute left-4
+                top-2 translate-y-0
+                text-sm font-semibold text-gray-400
+                transition-all duration-200
+
+                peer-placeholder-shown:top-1/2
+                peer-placeholder-shown:-translate-y-1/2
+                peer-placeholder-shown:text-base
+
+                peer-focus:top-2
+                peer-focus:translate-y-0
+                peer-focus:text-sm
+                peer-focus:text-red-500"
           >
             Password
           </label>
