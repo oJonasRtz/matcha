@@ -25,13 +25,12 @@ clean: down
 
 fclean: clean
 	@echo "${RED}===== Erasing everything... =====${RESET}"
-	@docker system prune -a -f --volumes
+	@docker system prune -a -f matcha_db_data || true 
 	@rm -f ./server/certificates/*.crt
 	@rm -f ./server/certificates/*.key
 	@rm -f backend/.env
 	@rm -f frontend/.env
 	@rm -f database/.env
-	@rm -rf database/data
 
 check-env:
 	@missing=0; \

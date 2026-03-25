@@ -43,10 +43,13 @@ services:
     networks:
       - db_network
     volumes:
-      - ./database/data:/var/lib/postgresql #persist data
+      - db_data:/var/lib/postgresql #persist data
       - ./database/init:/docker-entrypoint-initdb.d
     env_file:
       - ./database/.env
+
+volumes:
+  db_data: #persist data in /var/lib/docker/volumes/
 
 networks:
   db_network:
