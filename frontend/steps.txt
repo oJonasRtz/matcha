@@ -88,3 +88,13 @@ export default function Home() {
   );
 }
 
+A correção foi:
+
+* definir a label **levantada por padrão** com `top-2`
+* fazer ela **descer só quando o campo está vazio** com `peer-placeholder-shown:top-1/2`
+* usar `-translate-y-1/2` para centralizar no meio
+* quando há texto, o estado `placeholder-shown` some, então ela volta automaticamente para cima
+
+Ou seja: **vazio = desce**, **com caractere = sobe e permanece levantada**.
+
+resolver o caso do input com o floating table errado
