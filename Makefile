@@ -42,12 +42,12 @@ check-env:
 		fi; \
 	done; \
 	if [ $$missing -eq 1 ]; then \
-		bash ./scripts/setup.sh; \
+		bash ./scripts/env_setup.sh; \
 	fi
 
 tls:
 	@echo "${GREEN}===== Generating TLS certificates... =====${RESET}"
-	@bash ./server/certificates/generate.sh
+	@bash ./scripts/generate_ssl_certs.sh
 
 re: down up
 
