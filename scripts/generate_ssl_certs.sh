@@ -2,8 +2,15 @@
 set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CERT="$DIR/server.cert"
-KEY="$DIR/server.key"
+CERT="server/certificates/server.cert"
+KEY="server/certificates/server.key"
+
+if [[ -f "$CERT" && -f "$KEY" ]]; then
+    echo -e "${GREEN}Certificate and key already exist. Skipping generation.${RESET}"
+    exit 0
+fi
+
+mkdir -p server/certificates
 
 # install mkcert if not installed
 if ! command -v mkcert &> /dev/null; then

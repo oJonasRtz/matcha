@@ -3,6 +3,7 @@
 # TLS certificates
 *.cert
 *.key
+server/certificates/
 
 #database persistent data
 database/data/
