@@ -18,9 +18,20 @@ def upload():
     # Exemplo: file.save(os.path.join("uploads", file.filename))
     return jsonify({"message": f"File '{file.filename}' received successfully"}), 200
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"}), 200
+
 @app.errorhandler(RequestEntityTooLarge)
 def handle_file_too_large(e):
     return jsonify({"error": f"File is too large. Maximum size is {limit} MB"}), 413
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        ssl_context=(
+            "/certificates/server.cert",
+            "/certificates/server.key"
+        )
+    )

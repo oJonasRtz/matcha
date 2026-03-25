@@ -12,6 +12,7 @@ services:
       - frontend
       - backend
 
+  #Note: expose only for tests, not for production
   frontend:
     build: ./frontend
     expose:
@@ -19,6 +20,8 @@ services:
 
   backend:
     build: ./backend
+    volumes:
+      - ./server/certificates:/certificates
     expose:
       - "5000"
 
