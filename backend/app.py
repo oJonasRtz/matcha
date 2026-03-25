@@ -1,22 +1,25 @@
 from flask import Flask, jsonify, request
+from werkzeug.exceptions import RequestEntityTooLarge
+from src.loadRoutes import load_routes
 
 app = Flask(__name__)
 
-# health check (útil pra debug)
-@app.route("/api/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"}), 200
+#upload limits
+limit = 10  #in MB
+app.config["MAX_CONTENT_LENGTH"] = limit * 1024 * 1024
 
-# exemplo de endpoint
-@app.route("/api/hello", methods=["GET"])
-def hello():
-    return jsonify({"message": "Hello from Flask"}), 200
+load_routes(app)
 
-# exemplo POST
-@app.route("/api/echo", methods=["POST"])
-def echo():
-    data = request.json
-    return jsonify({"you_sent": data}), 200
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return jsonify({"error": f"File is too large. Maximum size is {limit} MB"}), 413
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        ssl_context=(
+            "/certificates/server.cert",
+            "/certificates/server.key"
+        )
+    )
