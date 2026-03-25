@@ -1,3 +1,8 @@
+CREATE TABLE IF NOT EXISTS tags (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(100) UNIQUE NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS users (
 	id SERIAL PRIMARY KEY,
 	user_id VARCHAR(255) UNIQUE NOT NULL,
@@ -8,8 +13,18 @@ CREATE TABLE IF NOT EXISTS users (
 	sexual_orientation VARCHAR(50) NOT NULL,
 	bio TEXT,
 	age INTEGER NOT NULL,
-	tags VARCHAR(255)[],
-	frame_rate INTEGER NOT NULL
+	frame_rate INTEGER NOT NULL,
+	is_online BOOLEAN NOT NULL DEFAULT FALSE,
+	last_online TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_tags (
+	user_id INTEGER NOT NULL,
+	tag_id INTEGER NOT NULL,
+
+	PRIMARY KEY (user_id, tag_id),
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS auth (
@@ -17,5 +32,109 @@ CREATE TABLE IF NOT EXISTS auth (
 	email VARCHAR(255) UNIQUE NOT NULL,
 	password_hash VARCHAR(255) NOT NULL,
 	user_id INTEGER NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS likes (
+	id SERIAL PRIMARY KEY,
+	liker_id INTEGER NOT NULL,
+	liked_id INTEGER NOT NULL,
+
+	FOREIGN KEY (liker_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (liked_id) REFERENCES users(id) ON DELETE CASCADE,
+	
+	UNIQUE (liker_id, liked_id)
+);
+
+# index for efficient lookup of mutual likes
+CREATE INDEX IF NOT EXISTS idx_likes_liker_id ON likes(liker_id);
+CREATE INDEX IF NOT EXISTS idx_likes_liked_id ON likes(liked_id);
+CREATE INDEX IF NOT EXISTS idx_likes_liker_liked ON likes(liker_id, liked_id);
+
+CREATE TABLE IF NOT EXISTS profile_views (
+	id SERIAL PRIMARY KEY,
+	viewer_id INTEGER NOT NULL,
+	viewed_id INTEGER NOT NULL,
+	viewed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY (viewer_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (viewed_id) REFERENCES users(id) ON DELETE CASCADE,
+
+	UNIQUE (viewer_id, viewed_id)
+);
+
+CREATE TABLE IF NOT EXISTS blocks (
+	id SERIAL PRIMARY KEY,
+	blocker_id INTEGER NOT NULL,
+	blocked_id INTEGER NOT NULL,
+
+	FOREIGN KEY (blocker_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (blocked_id) REFERENCES users(id) ON DELETE CASCADE,
+	
+	UNIQUE (blocker_id, blocked_id)
+);
+
+CREATE TABLE IF NOT EXISTS reports (
+	id SERIAL PRIMARY KEY,
+	reporter_id INTEGER NOT NULL,
+	reported_id INTEGER NOT NULL,
+	reason TEXT NOT NULL,
+	reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (reported_id) REFERENCES users(id) ON DELETE CASCADE,
+
+	UNIQUE (reporter_id, reported_id)
+);
+
+CREATE TABLE IF NOT EXISTS chats(
+	id SERIAL PRIMARY KEY,
+	user1_id INTEGER NOT NULL,
+	user2_id INTEGER NOT NULL,
+
+	FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+
+	UNIQUE (user1_id, user2_id)
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+	id SERIAL PRIMARY KEY,
+	chat_id INTEGER NOT NULL,
+	sender_id INTEGER NOT NULL,
+	content TEXT NOT NULL,
+	sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS user_images (
+	id SERIAL PRIMARY KEY,
+	user_id INTEGER NOT NULL,
+	image_url TEXT NOT NULL,
+	is_profile BOOLEAN NOT NULL DEFAULT FALSE,
+	position INTEGER NOT NULL,
+
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS user_locations (
+	user_id INTEGER PRIMARY KEY,
+	latitude DOUBLE PRECISION NOT NULL,
+	longitude DOUBLE PRECISION NOT NULL,
+	address TEXT,
+
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+	id SERIAL PRIMARY KEY,
+	user_id INTEGER NOT NULL,
+	type VARCHAR(50) NOT NULL,
+	content JSONB NOT NULL,
+	is_read BOOLEAN NOT NULL DEFAULT FALSE,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
