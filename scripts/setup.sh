@@ -5,20 +5,34 @@ RESET='\033[0m'
 
 echo "Generating .env files..."
 
+#secrets
 API_KEY=$(openssl rand -hex 32)
+DB_USER="user"
+DB_PASSWORD=$(openssl rand -hex 32)
+DB_NAME="mydb"
 
 #backend
-if [ ! -f "backend/.env" ]; then
-  cat > backend/.env << EOF
+cat > backend/.env << EOF
 API_KEY=$API_KEY
+DB_HOST=database
+DB_USER=$DB_USER
+DB_PASSWORD=$DB_PASSWORD
+DB_NAME=$DB_NAME
 EOF
-fi
+
 
 #frontend
-if [ ! -f "frontend/.env" ]; then
-	cat > frontend/.env << EOF
-VITE_API_KEY=$API_KEY
+cat > frontend/.env << EOF
+API_KEY=$API_KEY
 EOF
-fi
+
+
+#database
+cat > database/.env << EOF
+POSTGRES_USER=$DB_USER
+POSTGRES_PASSWORD=$DB_PASSWORD
+POSTGRES_DB=$DB_NAME
+EOF
+
 
 echo -e "${GREEN}.env files generated successfully.${RESET}"

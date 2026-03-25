@@ -1,3 +1,8 @@
 *.env
+
+# TLS certificates
 *.cert
 *.key
+
+#database persistent data
+database/data/
