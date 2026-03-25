@@ -18,8 +18,8 @@ fclean: clean
 check-env:
 	@for dir in backend frontend; do \
 		if [ ! -f "$$dir/.env" ]; then \
-			echo "Error: .env file not found in $$dir directory."; \
-			exit 1; \
+			echo "\033[31mError:\033[0m .env file not found in $$dir directory."; \
+			bash ./scripts/setup.sh; \
 		fi; \
 	done
 
