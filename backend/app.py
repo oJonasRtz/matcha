@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
+from src.loadRoutes import load_routes
 
 app = Flask(__name__)
 
@@ -7,20 +8,7 @@ app = Flask(__name__)
 limit = 10  #in MB
 app.config["MAX_CONTENT_LENGTH"] = limit * 1024 * 1024
 
-@app.route("/upload", methods=["POST"])
-def upload():
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
-    # Aqui você pode salvar o arquivo ou processá-lo como quiser
-    # Exemplo: file.save(os.path.join("uploads", file.filename))
-    return jsonify({"message": f"File '{file.filename}' received successfully"}), 200
-
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"}), 200
+load_routes(app)
 
 @app.errorhandler(RequestEntityTooLarge)
 def handle_file_too_large(e):
