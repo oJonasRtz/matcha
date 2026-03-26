@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 
 export default function StartPage() {
   return (
-    <section className="min-h-screen w-full bg-black/20 text-white px-6 py-10">
+    <section className="min-h-screen w-full bg-black/20 text-white px-6 py-10 pt-30">
 
         <section className="grid gap-6 md:grid-cols-3">
 	  <Link href="#">
