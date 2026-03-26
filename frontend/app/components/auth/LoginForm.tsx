@@ -95,6 +95,9 @@ export default function LoginForm() {
         >
           <strong>Create new account</strong>
         </Link>
+	<Link href="/" className="transition hover:text-blue-300 hover:underline">
+            <strong>Return to main page</strong>
+          </Link>
       </div>
       <footer className="mt-8 border-t border-white/20 pt-4">
         <div className="flex justify-center gap-4 text-xs text-white/70">
