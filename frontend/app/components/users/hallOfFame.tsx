@@ -13,30 +13,30 @@ export default function HallOfFame() {
   ];
 
   return (
-    <section className="fixed bottom-0 top-0 right-0 z-40 w-[300px] border border-white/20 bg-black/35 p-4 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
-      <div className="mb-1">
-        <h2 className="text-2xl text-center font-bold text-white">Hall of Fame</h2>
+    <section className="w-full rounded-3xl border border-white/20 bg-black/35 p-4 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
+      <div className="mt-1">
+        <h2 className="text-center text-xl font-bold text-white">Hall of Fame</h2>
       </div>
 
-      <div className="space-y-2">
+      <div className="mt-5 space-y-2">
         {topUsers.map((user, index) => (
           <div
             key={user.id}
-            className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            className="mt-1 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-3"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-500 font-bold text-white">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500 font-bold text-white">
                 {index + 1}
               </div>
 
-              <div>
-                <p className="font-semibold text-white">{user.name}</p>
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-white">{user.name}</p>
               </div>
             </div>
 
-            <div className="text-right">
+            <div className="ml-3 mt-0.5 shrink-0 text-right">
               <p className="font-bold text-pink-400">{user.matches}</p>
-              <p className="text-xs text-white/60">matches</p>
+              <p className="mt-1 text-xs text-white/60">matches</p>
             </div>
           </div>
         ))}

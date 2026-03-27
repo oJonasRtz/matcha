@@ -1,14 +1,15 @@
-import { Camera, Heart, Trophy, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Camera, Heart, Trophy, Sparkles, Users } from "lucide-react";
 
 export default function ProfileStatusCard() {
   return (
-    <section className="fixed left-20 top-0 z-20 w-[720px] border border-white/20 bg-black/35 p-5 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
-      <div className="flex flex-col items-center">
-        <div className="relative">
+    <section className="w-full rounded-3xl border border-white/20 bg-black/35 p-6 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
+      <div className="mt-1 flex flex-col items-center">
+        <div className="relative mt-2">
           <img
             src="https://cdn.pixabay.com/photo/2024/03/07/10/38/simba-8618301_1280.jpg"
             alt="Profile"
-            className="h-50 w-50 rounded-full border-2 border-white/20 object-cover"
+            className="h-36 w-36 rounded-full border-2 border-white/20 object-cover"
           />
 
           <button
@@ -20,29 +21,42 @@ export default function ProfileStatusCard() {
         </div>
 
         <h2 className="mt-4 text-xl font-bold text-white">myBeautifulCat</h2>
-        <p className="font-bold text-green/30">Online</p>
+        <p className="mt-1 font-semibold text-green-400">Online</p>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <div className="flex flex-1 flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
-          <Heart className="h-5 w-5 text-pink-400" />
+      <div className="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="mt-1 flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
+          <Link href="#">
+            <Heart className="h-6 w-6 text-pink-400" />
+          </Link>
           <span className="mt-2 text-xl font-bold text-white">248</span>
-          <span className="text-xs text-white/60">Matches</span>
+          <span className="mt-1 text-xs text-white/60">Matches</span>
         </div>
 
-        <div className="flex flex-1 flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
-          <Trophy className="h-5 w-5 text-yellow-300" />
+        <div className="mt-1 flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
+          <Link href="#">
+            <Trophy className="h-6 w-6 text-yellow-300" />
+          </Link>
           <span className="mt-2 text-xl font-bold text-white">#18</span>
-          <span className="text-xs text-white/60">Rank</span>
+          <span className="mt-1 text-xs text-white/60">Rank</span>
         </div>
 
-        <div className="flex flex-1 flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
-          <Sparkles className="h-5 w-5 text-red-400" />
+        <div className="mt-1 flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
+          <Link href="#">
+            <Sparkles className="h-6 w-6 text-red-400" />
+          </Link>
           <span className="mt-2 text-xl font-bold text-white">913</span>
-          <span className="text-xs text-white/60">Likes</span>
+          <span className="mt-1 text-xs text-white/60">Likes</span>
+        </div>
+
+        <div className="mt-1 flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-3 py-4">
+          <Link href="#">
+            <Users className="h-6 w-6 text-cyan-300" />
+          </Link>
+          <span className="mt-2 text-xl font-bold text-white">453</span>
+          <span className="mt-1 text-xs text-white/60">Visitors</span>
         </div>
       </div>
-
     </section>
   );
 }
