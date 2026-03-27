@@ -3,6 +3,7 @@ from src.endpoints.utils.get_body import get_body
 from src.objects.Database import Database
 from src.endpoints.utils.check_strong_password import is_strong_password
 import bcrypt
+from src.endpoints.utils.generate_jwt import generate_jwt
 
 class public_routes:
 	__ROUTES = [
@@ -95,4 +96,50 @@ class public_routes:
 	
 	@staticmethod
 	def _login():
-		pass
+		data, error = get_body(
+			required_fields=[
+				"username",
+				"password"
+			]
+		)
+		if error:
+			return jsonify({"error": error}), 400
+
+		try:
+			user = Database.run_query(
+				"""
+    			SELECT u.id, u.public_id, a.password_hash, u.is_online
+				FROM users u
+				JOIN auth a ON u.id = a.user_id
+				WHERE u.username = %s
+       			""",
+				(data["username"],),
+				fetch_one=True
+			)
+			if not user:
+				return jsonify({"error": "Invalid username or password."}), 401
+
+			user_id, public_id, password_hash, is_online = user
+
+			# if is_online:
+			# 	return jsonify({"error": "User is already logged in."}), 400
+   
+			if not bcrypt.checkpw(data["password"].encode('utf-8'), password_hash.encode('utf-8')):
+				return jsonify({"error": "Invalid username or password."}), 401
+			
+			Database.run_query(
+				"""
+    			UPDATE users
+				SET is_online = TRUE, last_online = NOW()
+				WHERE id = %s
+	   			""",
+				(user_id,)
+			)
+   
+			token = generate_jwt(public_id)
+			return jsonify({
+				"message": "Login successful.",
+				"token": token
+			}), 200
+		except Exception as e:
+			return jsonify({"error": f"Login failed. {str(e)}"}), 400
