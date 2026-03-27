@@ -1,7 +1,7 @@
 import os
 from flask import jsonify, request, Flask, g
 import jwt
-
+from src.objects.Database import Database
 def set_middlewares(app):
     '''
 Sets global middlewares for the Flask app, including:
@@ -44,6 +44,19 @@ Headers:
             payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
             g.user = payload 
         except jwt.ExpiredSignatureError:
+            try:
+                payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"], options={"verify_exp": False})
+                public_id = payload.get("public_id")
+                Database.run_query(
+                    """
+                    UPDATE users
+                    SET is_online = FALSE, last_online = NOW()
+                    WHERE public_id = %s
+                    """,
+                    (public_id,)
+                )
+            except:
+                pass
             return jsonify({"error": "Token expired"}), 401
         except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token"}), 401

@@ -11,5 +11,5 @@ if __name__ == "__main__":
         ssl_context=(
             "/certificates/server.cert",
             "/certificates/server.key"
-        )
+        ),
     )
