@@ -6,23 +6,22 @@ RESET='\033[0m'
 echo "Generating .env files..."
 
 #secrets
-API_KEY=$(openssl rand -hex 32)
 DB_USER="user"
 DB_PASSWORD=$(openssl rand -hex 32)
 DB_NAME="mydb"
+JWT_SECRET=$(openssl rand -hex 32)
 
 #backend
 cat > backend/.env << EOF
-API_KEY=$API_KEY
 DB_HOST=database
 DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
 DB_NAME=$DB_NAME
+JWT_SECRET=$JWT_SECRET
 EOF
 
 #frontend
 cat > frontend/.env << EOF
-API_KEY=$API_KEY
 EOF
 
 #database

@@ -1,15 +1,15 @@
-from src.endpoints.public.health import health
-from src.endpoints.private.getInfo import get_info
 from flask import Flask
+from src.endpoints.public_routes import public_routes
+from src.endpoints.private_routes import private_routes
+
 
 class Routes:
     def __init__(self):
         # Define routes as tuples of (endpoint, function, methods, function_name)
         #public routes start with /public
-        self.routes = [
-            ('/getInfo', get_info, ["GET"], "get_info"),
-            ("/public/health", health, ["GET"], "health")
-        ]
+        self.routes = []
+        self.routes.extend(public_routes.get_routes())
+        self.routes.extend(private_routes.get_routes())
         
     def load_routes(self, app):
         if not app or not isinstance(app, Flask):
