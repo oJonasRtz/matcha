@@ -2,6 +2,8 @@ import os
 from flask import jsonify, request, Flask, g
 import jwt
 from src.objects.Database import Database
+
+
 def set_middlewares(app):
     '''
 Sets global middlewares for the Flask app, including:

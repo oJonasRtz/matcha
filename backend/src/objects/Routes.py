@@ -2,7 +2,6 @@ from flask import Flask
 from src.endpoints.public_routes import public_routes
 from src.endpoints.private_routes import private_routes
 
-
 class Routes:
     def __init__(self):
         # Define routes as tuples of (endpoint, function, methods, function_name)
