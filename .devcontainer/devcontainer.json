@@ -13,9 +13,6 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
 
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-
         "bradlc.vscode-tailwindcss",
 
         "humao.rest-client",

@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { Card } from "../public/card";
 
 export default function LoginForm() {
   return (
-    <section className="w-full max-w-md rounded-2xl bg-black/30 backdrop-blur-lg border border-white/80 p-8 shadow-[0_0_12px_rgba(59,130,246,0.30),0_0_26px_rgba(34,211,238,0.22),0_0_42px_rgba(251,191,36,0.10)]">
+    <Card className="max-w-md">
       <h1 className="mb-6 text-center text-white text-3xl font-bold">Login</h1>
 
       <form className="flex flex-col gap-6">
@@ -109,6 +110,6 @@ export default function LoginForm() {
           </Link>
         </div>
       </footer>
-    </section>
+    </Card>
   );
 }
