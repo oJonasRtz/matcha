@@ -47,7 +47,7 @@ export default function Sidebar() {
   const icons = [
     { icon: Heart, title: "Matches", ref: "#", variant: pinkHover },
     { icon: Smile, title: "Swipe profiles", ref: "#", variant: pinkHover },
-    { icon: MessageCircle, title: "Messages", ref: "#", variant: pinkHover },
+    { icon: MessageCircle, title: "Messages", ref: "/chat", variant: pinkHover },
     { icon: Bell, title: "Notifications", ref: "#", variant: pinkHover },
     { icon: User, title: "Dashboard", ref: "/dashboard", variant: pinkHover },
     { icon: Globe, title: "Discover", ref: "#", variant: pinkHover },
@@ -76,9 +76,8 @@ export default function Sidebar() {
                 baseButton,
                 mobileButton,
                 desktopButton,
-                variant,
+                isActive ? "text-pink-400 bg-white/10" : variant,
                 extra,
-                isActive ? pinkHover : "",
               ].join(" ")}
             >
               <Icon className={iconSize} />
