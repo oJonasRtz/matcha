@@ -1,7 +1,11 @@
 import Sidebar from "../components/users/sidebar";
 import Chat from "../components/users/chat";
 
-export default function Dashboard() {
+export const metadata = {
+  title: "Chat",
+}
+
+export default function ChatPage() {
   // ===== STYLES =====
   const mainStyle = "flex min-h-screen items-stretch";
   const sectionStyle = "flex-1 min-w-0 w-full flex flex-wrap gap-6 px-6 py-4";
@@ -10,10 +14,11 @@ export default function Dashboard() {
 
   return (
     <main className={mainStyle}>
-      <Sidebar />
-      <section className={sectionStyle}>
-	<Chat />
-      </section>
+      <Sidebar>
+        <section className={sectionStyle}>
+          <Chat />
+        </section>
+      </Sidebar>
     </main>
   )
 }
