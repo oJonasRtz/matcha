@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { Card } from "../public/card";
 
 export default function RegisterForm() {
   return (
-    <section className="w-full max-w-lg rounded-2xl bg-black/30 backdrop-blur-lg border border-pink-200/50 p-2.75 shadow-[0_0_10px_rgba(244,114,182,0.35),0_0_24px_rgba(217,70,239,0.25),0_0_42px_rgba(168,85,247,0.18)]">
+    <Card className="max-w-md">
       <h1 className="mb-6 text-center text-white text-3xl font-bold">Register</h1>
 
       <form className="flex flex-col gap-1.75">
@@ -283,6 +284,6 @@ export default function RegisterForm() {
           </Link>
         </div>
       </footer>
-    </section>
+    </Card>
   );
 }

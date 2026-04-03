@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Camera, Heart, Trophy, Sparkles, Users } from "lucide-react";
+import { Card } from "../public/card";
 
 export default function ProfileStatusCard() {
   return (
-    <section className="w-full rounded-3xl border border-white/20 bg-black/35 p-6 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
+    <Card>
       <div className="mt-1 flex flex-col items-center">
         <div className="relative mt-2">
           <img
@@ -57,6 +58,7 @@ export default function ProfileStatusCard() {
           <span className="mt-1 text-xs text-white/60">Visitors</span>
         </div>
       </div>
-    </section>
+    </Card>
   );
 }
+

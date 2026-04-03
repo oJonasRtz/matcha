@@ -1,5 +1,5 @@
 import Sidebar from "../components/users/sidebar";
-import Chat from "../components/users/chat";
+// import Chat from "../components/users/chat";
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
 
         <section className="flex-1">
           <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 px-6 py-4">
-		<Chat />
+		{/* <Chat /> */}
           </div>
         </section>
       </div>

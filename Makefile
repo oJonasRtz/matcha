@@ -12,6 +12,8 @@ all: up
 up: check-env tls
 	@echo "${GREEN}===== Starting the services... =====${RESET}"
 	@$(COMPOSE) up -d --build
+	@echo "${GREEN}===== Services are up and running! =====${RESET}"
+	@echo "${YELLOW}===== You can access at https://localhost =====${RESET}"
 
 down:
 	@echo "${YELLOW}===== Stopping the services... =====${RESET}"

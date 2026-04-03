@@ -1,3 +1,5 @@
+import { Card } from "../public/card";
+
 export default function HallOfFame() {
   const topUsers = [
     { id: 1, name: "Sophia", matches: 1280 },
@@ -13,7 +15,7 @@ export default function HallOfFame() {
   ];
 
   return (
-    <section className="w-full rounded-3xl border border-white/20 bg-black/35 p-4 backdrop-blur-md shadow-[0_0_30px_rgba(255,0,90,0.12)]">
+    <Card>
       <div className="mt-1">
         <h2 className="text-center text-xl font-bold text-white">Hall of Fame</h2>
       </div>
@@ -41,6 +43,6 @@ export default function HallOfFame() {
           </div>
         ))}
       </div>
-    </section>
+    </Card>
   );
 }
