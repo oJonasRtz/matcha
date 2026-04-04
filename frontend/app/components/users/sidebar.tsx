@@ -49,7 +49,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
     { icon: Heart, title: "Swipe", ref: "/swipe", variant: pinkHover },
     // { icon: Smile, title: "Swipe profiles", ref: "#", variant: pinkHover },
     { icon: MessageCircle, title: "Messages", ref: "/chat", variant: pinkHover },
-    { icon: Bell, title: "Notifications", ref: "/notifications", variant: pinkHover },
+    { icon: Bell, title: "Notifications", ref: "/notifications", variant: pinkHover, extra: "relative" },
     { icon: User, title: "Dashboard", ref: "/dashboard", variant: pinkHover },
     { icon: Globe, title: "Discover", ref: "/discover", variant: pinkHover },
     { icon: Settings, title: "Settings", ref: "/settings", variant: pinkHover },
@@ -85,6 +85,11 @@ export default function Sidebar({ children }: { children: ReactNode }) {
                 ].join(" ")}
               >
                 <Icon className={iconSize} />
+                {title === 'Notifications' && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    3 {/* Example count, replace with actual count */}
+                  </span>
+                )}
               </button>
             );
         })}
