@@ -61,6 +61,7 @@ export default function SimpleChatComponent() {
       {
         id: Date.now(),
         sender: "Bruno",
+        letter: "B",
         avatar: "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
         content: value,
         side: "right",
@@ -73,7 +74,7 @@ export default function SimpleChatComponent() {
     setText("");
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSend();

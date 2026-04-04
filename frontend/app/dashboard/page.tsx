@@ -24,6 +24,10 @@ import SearchPreferencesCard from "../components/users/searchPreferencesCard";
 //   );
 // }
 
+export const metadata = {
+  title: "Dashboard",
+}
+
 export default function Dashboard() {
   // ===== STYLES =====
   const mainStyle = "flex min-h-screen items-stretch";
@@ -35,7 +39,7 @@ export default function Dashboard() {
 
   return (
     <main className={mainStyle}>
-      <Sidebar />
+      <Sidebar>
       <section className={sectionStyle}>
         <div className={focus}>
           <SearchPreferencesCard />
@@ -45,8 +49,8 @@ export default function Dashboard() {
           <ProfileStatusCard />
           <HallOfFame />
         </div>
-
       </section>
+      </Sidebar>
     </main>
   )
 }

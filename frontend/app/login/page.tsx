@@ -10,6 +10,10 @@ import LoginForm from "../components/auth/LoginForm";
 //   );
 // }
 
+export const metadata = {
+	  title: "Login",
+}
+
 export default function Login() {
 	return (
 		<main className="flex min-h-screen items-center justify-center gap-4">
