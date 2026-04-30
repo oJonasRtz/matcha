@@ -28,7 +28,7 @@ export default function LoginForm() {
       .then(({ data, res }) => {
         if (res.ok) {
           alert("Login successful!");
-          router.push("/");
+          router.push("/dashboard");
         } else {
           alert(data.message || "Login failed!");
         }
