@@ -14,10 +14,6 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     sexual_orientation: data.sexualOrientation,
   };
 
-  console.log("Payload:", payload);
-  // delete payload.sexualOrientation;
-  // delete payload.confirmPassword;
-
   if (data.password !== data.confirmPassword) {
     alert("Passwords do not match!");
     return;
@@ -31,7 +27,7 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     body: JSON.stringify(payload),
   })
     .then((res) => res.json())
-    .then((data, res) => {
+    .then(({data, res}) => {
       if (res.ok) {
         alert("Registration successful!");
         window.location.href = "/login";
