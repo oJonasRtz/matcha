@@ -1,12 +1,56 @@
+"use client";
+
 import Link from "next/link";
 import { Card } from "../public/card";
+import React from "react";
+
+function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+
+  const formData = new FormData(e.currentTarget);
+  const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+  const payload = {
+    ...data,
+    sexual_orientation: data.sexualOrientation,
+  };
+
+  console.log("Payload:", payload);
+  // delete payload.sexualOrientation;
+  // delete payload.confirmPassword;
+
+  if (data.password !== data.confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  fetch("/api/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((res) => res.json())
+    .then((data, res) => {
+      if (res.ok) {
+        alert("Registration successful!");
+        window.location.href = "/login";
+      } else {
+        alert(`Registration failed: ${data.message}`);
+      }
+    })
+    .catch((err) => {
+      console.error("Error:", err);
+      alert("An error occurred during registration.");
+    });
+}
 
 export default function RegisterForm() {
   return (
     <Card className="max-w-md">
       <h1 className="mb-6 text-center text-white text-3xl font-bold">Register</h1>
 
-      <form className="flex flex-col gap-1.75">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1.75">
         <div className="relative">
           <input
             id="email"
@@ -243,7 +287,7 @@ export default function RegisterForm() {
                 </label>
 
                 <label className="flex text-center items-center gap-2">
-                        <input type="radio" name="sexualOrientation" value="bissexual" />
+                        <input type="radio" name="sexualOrientation" value="bisexual" />
                         <strong>Bisexual</strong>
                 </label>
                 <label className="flex text-center justify-center items-center gap-2">
