@@ -21,7 +21,6 @@ class private_routes:
 
 	@staticmethod
 	def _logout():
-		#under development, it can fail sometimes, but it will be fixed in the future
 		auth_header = request.headers.get('Authorization')
 		if not auth_header or not auth_header.startswith("Bearer "):
 			return jsonify({"error": "Unauthorized"}), 401

@@ -3,8 +3,10 @@ import os
 import datetime
 
 JWT_SECRET = os.getenv("JWT_SECRET")
-JWT_ALGORITHM = "HS256"
-JWT_EXP_DELTA_HOURS = 2
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+value = os.getenv("JWT_EXP_HOURS")
+JWT_EXP_DELTA_HOURS = value
 
 def generate_jwt(public_id: str):
     payload = {

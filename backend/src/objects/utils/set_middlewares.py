@@ -19,7 +19,8 @@ Headers:
         raise ValueError("Expected a Flask app instance")	
         
     JWT_SECRET = os.getenv("JWT_SECRET")
-    if not JWT_SECRET:
+    JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+    if not JWT_SECRET or JWT_SECRET == "":
         raise RuntimeError("JWT_SECRET not set in environment variables")
     
     @app.before_request
@@ -43,11 +44,11 @@ Headers:
         token = parts[1]
         
         try:
-            payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
             g.user = payload 
         except jwt.ExpiredSignatureError:
             try:
-                payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"], options={"verify_exp": False})
+                payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": False})
                 public_id = payload.get("public_id")
                 Database.run_query(
                     """
