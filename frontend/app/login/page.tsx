@@ -1,0 +1,23 @@
+import LoginForm from "../components/auth/LoginForm";
+
+// export default function Home() {
+//   return (
+// 	<main className="h-dvh overscroll-none overflow-y-auto min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
+// 		style={{ backgroundImage: "url('/images/leaves.jpg')" }}
+// 	>
+// 		<LoginForm />
+// 	</main>
+//   );
+// }
+
+export const metadata = {
+	  title: "Login",
+}
+
+export default function Login() {
+	return (
+		<main className="flex min-h-screen items-center justify-center gap-4">
+			<LoginForm />
+		</main>
+	)
+}

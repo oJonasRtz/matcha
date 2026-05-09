@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS reports (
+	id SERIAL PRIMARY KEY,
+	reporter_id INTEGER NOT NULL,
+	reported_id INTEGER NOT NULL,
+	reason TEXT NOT NULL,
+	reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (reported_id) REFERENCES users(id) ON DELETE CASCADE,
+
+	UNIQUE (reporter_id, reported_id)
+);
