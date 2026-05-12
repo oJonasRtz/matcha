@@ -68,8 +68,8 @@ import os
 from flask import Flask, jsonify, request, g
 import jwt
 
-def set_middlewares(app):
-    if not app or not isinstance(app, Flask):
+def set_middlewares(app, pub_routes):
+    if not app or not isinstance(app, Flask) or not isinstance(pub_routes, list):
         raise ValueError("Expected a Flask app instance")
     
     
@@ -83,7 +83,7 @@ def set_middlewares(app):
         path = request.path
         
         # -- Public routes --
-        if path.startswith("/public"):
+        if any(path.startswith(route) for route, _, _, _ in pub_routes):
             g.user = None
             return
         
@@ -92,7 +92,7 @@ def set_middlewares(app):
         if not auth_header or not auth_header.startswith("Bearer "):
             return jsonify({"error": "Unauthorized"}), 401
         
-        parts = auth_header.split(" ")
+        parts = auth_header.split()
         if len(parts) != 2:
             return jsonify({"error": "Unauthorized"}), 401
             

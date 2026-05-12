@@ -1,7 +1,6 @@
-from flask import jsonify, request
+from flask import jsonify, request, g
 from src.objects.Database import Database
 import jwt
-from src.endpoints.utils.generate_jwt import JWT_SECRET, JWT_ALGORITHM, JWT_EXP_DELTA_HOURS
 
 class private_routes:
 	_ROUTES = [
@@ -21,14 +20,8 @@ class private_routes:
 
 	@staticmethod
 	def _logout():
-		auth_header = request.headers.get('Authorization')
-		if not auth_header or not auth_header.startswith("Bearer "):
-			return jsonify({"error": "Unauthorized"}), 401
-
-		token = auth_header.split(" ")[1]
 		try:
-			payload = jwt.decode(token, str(JWT_SECRET), algorithms=[JWT_ALGORITHM])
-			public_id = payload.get("public_id")
+			public_id = g.user.get("public_id")
 			Database.run_query(
 				"""
     			UPDATE users

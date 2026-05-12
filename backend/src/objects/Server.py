@@ -7,7 +7,7 @@ class Server:
         self.app = Flask(__name__)
         self.routes = Routes()
         
-        set_middlewares(self.app)
+        set_middlewares(self.app, self.routes.get_public_routes())
         self._set_upload_limit(10)
         self.routes.load_routes(self.app)
         self._set_error_handlers()

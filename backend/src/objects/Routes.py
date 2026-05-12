@@ -9,6 +9,12 @@ class Routes:
         self.routes = []
         self.routes.extend(public_routes.get_routes())
         self.routes.extend(private_routes.get_routes())
+
+    def get_public_routes(self):
+        return public_routes.get_routes()
+    
+    def get_private_routes(self):
+        return private_routes.get_routes()
         
     def load_routes(self, app):
         if not app or not isinstance(app, Flask):
