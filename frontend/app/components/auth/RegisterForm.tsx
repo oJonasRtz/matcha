@@ -1,12 +1,54 @@
-import Link from "next/link";
+"use client";
+
 import { Card } from "../public/card";
+import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+    const payload = {
+      ...data,
+      sexual_orientation: data.sexualOrientation,
+    };
+
+    if (data.password !== data.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then(({data, res}) => {
+        if (res.ok) {
+          alert("Registration successful!");
+          router.push("/login");
+        } else {
+          alert(`Registration failed: ${data.message}`);
+        }
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        alert("An error occurred during registration.");
+      });
+  }
+
   return (
     <Card className="max-w-md">
       <h1 className="mb-6 text-center text-white text-3xl font-bold">Register</h1>
 
-      <form className="flex flex-col gap-1.75">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1.75">
         <div className="relative">
           <input
             id="email"
@@ -243,7 +285,7 @@ export default function RegisterForm() {
                 </label>
 
                 <label className="flex text-center items-center gap-2">
-                        <input type="radio" name="sexualOrientation" value="bissexual" />
+                        <input type="radio" name="sexualOrientation" value="bisexual" />
                         <strong>Bisexual</strong>
                 </label>
                 <label className="flex text-center justify-center items-center gap-2">
@@ -260,28 +302,28 @@ export default function RegisterForm() {
         </button>
       </form>
       <div className="mt-5 flex flex-col items-center gap-4 text-sm">
-        <Link
-          href="#"
+        <button
+          onClick={() => router.push("#")}
           className="text-white/80 transition hover:text-blue-300 hover:underline"
         >
           <strong>Forgot password?</strong>
-        </Link>
+        </button>
 
-        <Link
-          href="/login"
+        <button
+          onClick={() => router.push("/login")}
           className="font-semibold text-white transition hover:text-blue-300 hover:underline"
         >
           <strong>Login</strong>
-        </Link>
+        </button>
       </div>
       <footer className="mt-4 border-t border-white/20 pt-4">
         <div className="flex justify-center gap-4 text-xs text-white/70">
-          <Link href="#" className="transition hover:text-blue-300 hover:underline">
+          <button onClick={() => router.push("#")} className="transition hover:text-blue-300 hover:underline">
             <strong>Terms of Service</strong>
-          </Link>
-          <Link href="#" className="transition hover:text-blue-300 hover:underline">
+          </button>
+          <button onClick={() => router.push("#")} className="transition hover:text-blue-300 hover:underline">
             <strong>Privacy Policy</strong>
-          </Link>
+          </button>
         </div>
       </footer>
     </Card>

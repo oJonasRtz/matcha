@@ -7,7 +7,7 @@ class Server:
         self.app = Flask(__name__)
         self.routes = Routes()
         
-        set_middlewares(self.app)
+        set_middlewares(self.app, self.routes.get_public_routes())
         self._set_upload_limit(10)
         self.routes.load_routes(self.app)
         self._set_error_handlers()
@@ -21,4 +21,4 @@ class Server:
             return jsonify({"error": f"File is too large. Maximum size is {self.app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)} MB"}), 413
     
     def run(self, host="", port=5000, ssl_context=None):
-        self.app.run(host=host, port=port, ssl_context=ssl_context)
+        self.app.run(host=host, port=port, ssl_context=ssl_context, threaded=True)

@@ -17,6 +17,13 @@ export default function Sidebar({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  function handleLogout() {
+    fetch("/api/logout", {
+      method: "POST",
+    });
+    router.push("/");
+  }
+
   // ===== ASIDE =====
   const asideStyle =
   // Mobile
@@ -46,19 +53,20 @@ export default function Sidebar({ children }: { children: ReactNode }) {
   // ===== ICONS =====
   const iconSize = "h-6 w-6 shrink-0";
   const icons = [
-    { icon: Heart, title: "Swipe", ref: "/swipe", variant: pinkHover },
+    { icon: Heart, title: "Swipe", ref: "/swipe", variant: pinkHover, handler: () => router.push("/swipe") },
     // { icon: Smile, title: "Swipe profiles", ref: "#", variant: pinkHover },
-    { icon: MessageCircle, title: "Messages", ref: "/chat", variant: pinkHover },
-    { icon: Bell, title: "Notifications", ref: "/notifications", variant: pinkHover, extra: "relative" },
-    { icon: User, title: "Dashboard", ref: "/dashboard", variant: pinkHover },
-    { icon: Globe, title: "Discover", ref: "/discover", variant: pinkHover },
-    { icon: Settings, title: "Settings", ref: "/settings", variant: pinkHover },
+    { icon: MessageCircle, title: "Messages", ref: "/chat", variant: pinkHover, handler: () => router.push("/chat") },
+    { icon: Bell, title: "Notifications", ref: "/notifications", variant: pinkHover, extra: "relative", handler: () => router.push("/notifications") },
+    { icon: User, title: "Dashboard", ref: "/dashboard", variant: pinkHover, handler: () => router.push("/dashboard") },
+    { icon: Globe, title: "Discover", ref: "/discover", variant: pinkHover, handler: () => router.push("/discover") },
+    { icon: Settings, title: "Settings", ref: "/settings", variant: pinkHover, handler: () => router.push("/settings") },
     {
       icon: LogOut,
       title: "Logout",
       ref: "/",
       variant: redHover,
       extra: "md:mt-auto", // desktop only
+      handler: handleLogout
     },
   ];
 
@@ -68,14 +76,14 @@ export default function Sidebar({ children }: { children: ReactNode }) {
     <div className="flex w-screen h-screen">
       <aside className={asideStyle}>
         <nav className={navStyle}>
-          {icons.map(({ icon: Icon, title, ref, variant, extra }, i) => {
+          {icons.map(({ icon: Icon, title, ref, variant, extra, handler }, i) => {
             const isActive = pathname === ref;
 
             return (
               <button
                 key={i}
                 title={title}
-                onClick={() => router.push(ref)}
+                onClick={handler}
                 className={[
                   baseButton,
                   mobileButton,
