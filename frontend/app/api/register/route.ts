@@ -4,7 +4,7 @@ export async function POST(req: Request) {
 	let res;
 
 	try {
-		res = await fetch("https://backend:5000/public/register", {
+		res = await fetch("https://backend:5000/user/register", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

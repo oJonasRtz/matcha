@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 export async function POST(req: Request) {
 	const body = await req.json();
 
-	const res = await fetch("https://backend:5000/public/login", {
+	const res = await fetch("https://backend:5000/sessions/login", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",

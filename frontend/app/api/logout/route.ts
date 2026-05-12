@@ -11,7 +11,7 @@ export async function POST() {
 			status: 401
 		});
 
-	const res = await fetch("https://backend:5000/logout", {
+	const res = await fetch("https://backend:5000/sessions/logout", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
