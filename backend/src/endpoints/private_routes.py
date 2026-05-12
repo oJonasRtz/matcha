@@ -1,5 +1,6 @@
 from flask import jsonify, request, g
 from src.objects.Database import Database
+from src.endpoints.utils.logout import logout
 import jwt
 
 class private_routes:
@@ -20,17 +21,4 @@ class private_routes:
 
 	@staticmethod
 	def _logout():
-		try:
-			public_id = g.user.get("public_id")
-			Database.run_query(
-				"""
-    			UPDATE users
-				SET is_online = FALSE, last_online = NOW()
-				WHERE public_id = %s
-       			""",
-				(public_id,)
-			)
-
-			return jsonify({"message": "Logged out successfully"}), 200
-		except Exception as e:
-			return jsonify({"error": "Invalid token"}), 401
+		return logout()
