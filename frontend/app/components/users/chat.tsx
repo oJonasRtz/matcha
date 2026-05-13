@@ -5,43 +5,138 @@ import Link from "next/link";
 import { Image, Paperclip, Send, Video } from "lucide-react";
 
 export default function SimpleChatComponent() {
-  const [text, setText] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "Nami",
-      letter: "N",
-      avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-      content: "Hello! What do you think about to go to the beach tomorrow?",
-      side: "left",
-      time: "09:12",
-    },
-    {
-      id: 2,
-      sender: "Haseo",
-      letter: "H",
-      avatar: "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
-      content: "Yes, I would also like to go to the beach with you.",
-      side: "right",
-      time: "09:13",
-    },
-    {
-      id: 3,
-      sender: "Nami",
-      letter: "N",
-      avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-      content: "That's perfect. See you tomorrow =D",
-      side: "left",
-      time: "09:14",
-    },
-  ]);
+// define the currentUser before the useState
 
+type ChatMessage = {
+  id: number;
+  sender: string;
+  letter: string;
+  avatar: string;
+  content: string;
+  time: string;
+};
+
+type Conversation = {
+  id: string;
+  name: string;
+  avatar: string;
+  status: string;
+  messages: ChatMessage[];
+};
+
+type TargetUser = {
+  name: string;
+  status: string;
+  avatar: string;
+};
+
+const currentUser = {
+  name: "Haseo",
+  letter: "H",
+  status: "online",
+  avatar:
+    "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
+};
+
+const [targetUser, setTargetUser] = useState<TargetUser>({
+  name: "Nami",
+  status: "online",
+  avatar: "https://i.redd.it/kij6hdu9sb8b1.png"
+});
+
+  const [text, setText] = useState("");
+const [activeConversationId, setActiveConversationId] = useState("nami");
+
+function handleSelectConversation(conversation: Conversation) {
+  setActiveConversationId(conversation.id);
+
+  setTargetUser({
+    name: conversation.name,
+    status: conversation.status,
+    avatar: conversation.avatar
+  });
+
+  setText("");
+}
+
+const [conversations, setConversations] = useState<Conversation[]>([
+  {
+    id: "nami",
+    name: "Nami",
+    avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
+    status: "online",
+    messages: [
+      {
+        id: 1,
+        sender: "Nami",
+        letter: "N",
+        avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
+        content: "Hello! What do you think about to go to the beach tomorrow?",
+        time: "09:12",
+      },
+      {
+        id: 2,
+        sender: "Haseo",
+        letter: "H",
+        avatar: currentUser.avatar,
+        content: "Yes, I would also like to go to the beach with you.",
+        time: "09:13",
+      },
+      {
+        id: 3,
+        sender: "Nami",
+        letter: "N",
+        avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
+        content: "That's perfect. See you tomorrow =D",
+        time: "09:14",
+      },
+    ],
+  },
+  {
+    id: "atoli",
+    name: "Atoli",
+    avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
+    status: "offline",
+    messages: [
+      {
+        id: 1,
+        sender: "Atoli",
+        letter: "A",
+        avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
+        content: "Haseo, are you there?",
+        time: "10:20",
+      },
+    ],
+  },
+  {
+    id: "ovan",
+    name: "Ovan",
+    avatar:
+      "https://static.wikia.nocookie.net/dothack/images/c/c6/Ovan_Cross_Rengeki.jpg/revision/latest/scale-to-width-down/250?cb=20100712022444",
+    status: "typing...",
+    messages: [
+      {
+        id: 1,
+        sender: "Ovan",
+        letter: "O",
+        avatar:
+          "https://static.wikia.nocookie.net/dothack/images/c/c6/Ovan_Cross_Rengeki.jpg/revision/latest/scale-to-width-down/250?cb=20100712022444",
+        content: "Let's talk later.",
+        time: "11:03",
+      },
+    ],
+  },
+]);
+
+const activeConversation =
+  conversations.find((conversation) => conversation.id === activeConversationId) ||
+  conversations[0];
   const people = useMemo(
     () => [
       {
-        name: "Nami",
-        avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-        status: "online",
+        name: targetUser.name,
+        avatar: targetUser.avatar,
+        status: targetUser.status,
       },
       {
         name: "Haseo",
@@ -49,30 +144,40 @@ export default function SimpleChatComponent() {
         status: "typing...",
       },
     ],
-    []
+    [targetUser]
   );
 
-  function handleSend() {
-    const value = text.trim();
-    if (!value) return;
+function handleSend() {
+  const value = text.trim();
+  if (!value) return;
 
-    setMessages((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        sender: "Bruno",
-        letter: "B",
-        avatar: "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
-        content: value,
-        side: "right",
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      },
-    ]);
-    setText("");
-  }
+  const newMessage = {
+    id: Date.now(),
+    sender: currentUser.name,
+    letter: currentUser.letter,
+    avatar: currentUser.avatar,
+    content: value,
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+
+  setConversations((current) =>
+    current.map((conversation) => {
+      if (conversation.id !== activeConversationId) {
+        return conversation;
+      }
+
+      return {
+        ...conversation,
+        messages: [...conversation.messages, newMessage],
+      };
+    })
+  );
+
+  setText("");
+}
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -83,7 +188,60 @@ export default function SimpleChatComponent() {
 
   return (
 	<div className="w-full h-full min-h-0 min-w-0 bg-slate-100 overflow-hidden">
-    	<div className="w-full h-full min-w-0 min-h-0 bg-white shadow-xl border border-slate-200 overflow-hidden grid grid-cols-[minmax(0,1fr)_96px]">
+	<div className="w-full h-full min-w-0 min-h-0 bg-white shadow-xl border border-slate-200 overflow-hidden grid grid-cols-[300px_minmax(0,1fr)_120px]">
+<aside className="h-full min-h-0 overflow-y-auto bg-white border-l border-slate-200 p-4">
+  <div className="mb-4">
+    <h2 className="text-sm font-semibold text-slate-900">
+      Conversations
+    </h2>
+    <p className="text-xs text-slate-500">
+      Select a chat
+    </p>
+  </div>
+
+  <div className="flex flex-col gap-3">
+    {conversations.map((conversation) => {
+      const isActive = conversation.id === activeConversationId;
+      const lastMessage =
+        conversation.messages[conversation.messages.length - 1];
+
+      return (
+        <button
+          key={conversation.id}
+          type="button"
+          onClick={() => handleSelectConversation(conversation)}
+          className={`w-full min-w-0 rounded-2xl border p-3 text-left transition ${
+            isActive
+              ? "border-slate-900 bg-slate-900 text-white"
+              : "border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100"
+          }`}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <img
+              src={conversation.avatar}
+              alt={conversation.name}
+              className="h-12 w-12 rounded-full object-cover shrink-0"
+            />
+
+            <div className="min-w-0">
+              <div className="text-sm font-semibold truncate">
+                {conversation.name}
+              </div>
+
+              <div
+                className={`text-xs truncate ${
+                  isActive ? "text-slate-300" : "text-slate-500"
+                }`}
+              >
+                {lastMessage?.content}
+              </div>
+            </div>
+          </div>
+        </button>
+      );
+    })}
+  </div>
+</aside>
 	<section className="min-h-0 min-w-0 overflow-hidden grid grid-rows-[auto_minmax(0,1fr)_auto]">
           <header className="border-b border-slate-200 px-6 py-4 flex items-center justify-between bg-white">
             <div>
@@ -93,8 +251,8 @@ export default function SimpleChatComponent() {
             <div className="text-sm text-slate-400">Only you and me =D</div>
           </header>
 <div className="min-h-0 min-w-0 overflow-y-auto overflow-x-hidden bg-slate-50 p-6 flex flex-col gap-4">
-            {messages.map((message) => {
-              const isRight = message.side === "right";
+	{activeConversation.messages.map((message) => {
+  		const isRight = message.sender === currentUser.name;
 
               return (
                 <div
@@ -216,7 +374,6 @@ export default function SimpleChatComponent() {
     ))}
   </div>
 </aside>
-
       </div>
     </div>
   );
