@@ -82,9 +82,9 @@ export default function SimpleChatComponent() {
   }
 
   return (
-    <div className="w-full h-full min-w-0 bg-slate-100">
-      <div className="w-full h-full bg-white shadow-xl border border-slate-200 overflow-hidden grid grid-cols-[1fr_96px]">
-        <section className="flex flex-col">
+	<div className="w-full h-full min-h-0 min-w-0 bg-slate-100 overflow-hidden">
+    	<div className="w-full h-full min-w-0 min-h-0 bg-white shadow-xl border border-slate-200 overflow-hidden grid grid-cols-[minmax(0,1fr)_96px]">
+	<section className="min-h-0 min-w-0 overflow-hidden grid grid-rows-[auto_minmax(0,1fr)_auto]">
           <header className="border-b border-slate-200 px-6 py-4 flex items-center justify-between bg-white">
             <div>
               <h1 className="text-lg font-semibold text-slate-900"><strong>Seductor Chat</strong></h1>
@@ -92,15 +92,14 @@ export default function SimpleChatComponent() {
             </div>
             <div className="text-sm text-slate-400">Only you and me =D</div>
           </header>
-
-          <div className="flex-1 bg-slate-50 px-6 py-5 overflow-y-auto space-y-4">
+<div className="min-h-0 min-w-0 overflow-y-auto overflow-x-hidden bg-slate-50 p-6 flex flex-col gap-4">
             {messages.map((message) => {
               const isRight = message.side === "right";
 
               return (
                 <div
                   key={message.id}
-                  className={`flex items-end gap-3 ${
+                  className={`min-w-0 flex items-end gap-3 ${
                     isRight ? "justify-end" : "justify-start"
                   }`}
                 >
@@ -113,7 +112,7 @@ export default function SimpleChatComponent() {
                   )}
 
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${
+                    className={`max-w-[75%] min-w-0 break-words [overflow-wrap:anywhere] rounded-2xl px-4 py-3 shadow-sm ... ${
                       isRight
                         ? "bg-slate-900 text-white rounded-br-md"
                         : "bg-white text-slate-800 rounded-bl-md border border-slate-200"
@@ -138,8 +137,8 @@ export default function SimpleChatComponent() {
           </div>
 
           <div className="border-t border-slate-200 bg-white p-4">
-            <div className="flex items-end gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 shadow-sm">
-              <div className="flex items-center gap-2 pb-1">
+            <div className="flex items-end gap-3 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 shadow-sm">
+              <div className="flex shrink-0 items-center gap-2 pb-1">
                 <button
                   type="button"
                   className="h-12 w-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 transition"
@@ -169,7 +168,7 @@ export default function SimpleChatComponent() {
                 onKeyDown={handleKeyDown}
                 rows={1}
                 placeholder="Type a message..."
-                className="flex-1 resize-none bg-transparent outline-none text-sm text-slate-800 placeholder:text-slate-400 py-2 max-h-28"
+                className="flex-1 min-w-0 resize-none bg-transparent outline-none text-sm text-slate-800 placeholder:text-slate-400 py-2 max-h-28"
               />
 
               <button
@@ -183,29 +182,40 @@ export default function SimpleChatComponent() {
             </div>
           </div>
         </section>
-	<aside className="bg-slate-900 text-white flex flex-col items-center py-6 gap-5">
-          <div className="text-xs uppercase tracking-[0.3em] text-slate-400">Chat</div>
+	<aside className="h-full min-h-0 shrink-0 overflow-hidden bg-slate-900 text-white flex flex-col items-center py-6 gap-5">
+<div className="text-xs uppercase tracking-[0.3em] text-slate-400">
+    Chat
+  </div>
 
-          <div className="flex flex-col items-center gap-4 mt-4">
-            {people.map((person) => (
-              <div   
-                key={person.name}
-                className="flex flex-col items-center gap-2"
-                title={person.name}
-              >
-                <div className="h-16 w-16 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold border border-slate-500">
-                  <Link href="#" className="block h-full w-full">
-                  <img src={person.avatar} alt={person.avatar} className="h-full w-full rounded-full object-cover"/>
-		</Link>
-                </div>
-                <div className="text-[14px] text-center leading-tight text-slate-300 max-w-[60px]">
-                  <div className="font-medium text-white"><strong>{person.name}</strong></div>
-                  <div><strong>{person.status}</strong></div>
-                </div>
-              </div>
-            ))}
+<div className="flex-1 min-h-0 flex flex-col items-center gap-4 mt-4">
+    {people.map((person) => (
+      <div
+        key={person.name}
+        className="flex flex-col items-center gap-2"
+        title={person.name}
+      >
+        <div className="h-16 w-16 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold border border-slate-500 shrink-0">
+          <Link href="#" className="block h-full w-full">
+            <img
+              src={person.avatar}
+              alt={person.name}
+              className="h-full w-full rounded-full object-cover"
+            />
+          </Link>
+        </div>
+
+        <div className="text-[14px] text-center leading-tight text-slate-300 max-w-[60px]">
+          <div className="font-medium text-white">
+            <strong>{person.name}</strong>
           </div>
-        </aside>
+          <div>
+            <strong>{person.status}</strong>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</aside>
 
       </div>
     </div>
