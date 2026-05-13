@@ -109,19 +109,18 @@ const [conversations, setConversations] = useState<Conversation[]>([
     ],
   },
   {
-    id: "ovan",
-    name: "Ovan",
+    id: "ino",
+    name: "Ino",
     avatar:
-      "https://static.wikia.nocookie.net/dothack/images/c/c6/Ovan_Cross_Rengeki.jpg/revision/latest/scale-to-width-down/250?cb=20100712022444",
+     "https://i.redd.it/i9kw0g493lgb1.jpg",
     status: "typing...",
     messages: [
       {
         id: 1,
-        sender: "Ovan",
-        letter: "O",
-        avatar:
-          "https://static.wikia.nocookie.net/dothack/images/c/c6/Ovan_Cross_Rengeki.jpg/revision/latest/scale-to-width-down/250?cb=20100712022444",
-        content: "Let's talk later.",
+        sender: "Ino",
+        letter: "I",
+        avatar: "https://i.redd.it/i9kw0g493lgb1.jpg", 
+        content: "Let's talk later, Haseeeeeoooooo! =D",
         time: "11:03",
       },
     ],
