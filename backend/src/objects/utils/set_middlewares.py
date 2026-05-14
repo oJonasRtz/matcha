@@ -32,7 +32,7 @@ def set_middlewares(app, pub_routes):
         parts = auth_header.split()
         if len(parts) != 2:
             return jsonify({"error": "Unauthorized"}), 401
-            
+
         token = parts[1]
         
         try:
@@ -48,8 +48,10 @@ def set_middlewares(app, pub_routes):
         
     @app.before_request
     def validator():
-        
         # <route, method>: validator_function
+        # validade return should be
+        #   data[the request body, if applied]
+        #   error[if something happens]
         val = {
             "/sessions/login": SessionController.login_validator,
             "/sessions/logout": None,  # No validation needed for logout since it just checks the token
@@ -61,8 +63,13 @@ def set_middlewares(app, pub_routes):
             return jsonify({"error": "Validator not found"}), 500    
         
         validate = val[route]
+        if validate is None:
+            return None
         
-        if validate:
-            return validate()
+        data, error = validate()
+        if error:
+            return jsonify({"error": error}), 400
+        
+        g.body = data
         
         return None

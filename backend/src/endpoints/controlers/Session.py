@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, g
 from src.endpoints.utils.get_body import get_body
 from src.objects.Database import Database
 import bcrypt
@@ -20,14 +20,7 @@ class SessionController:
 	
 	@staticmethod
 	def _login():
-		data, error = get_body(
-			required_fields=[
-				"username",
-				"password"
-			]
-		)
-		if error:
-			return jsonify({"error": error}), 400
+		data = g.body
 
 		try:
 			user = Database.run_query(
@@ -45,9 +38,6 @@ class SessionController:
 
 			user_id, public_id, password_hash, is_online = user
 
-			# if is_online:
-			# 	return jsonify({"error": "User is already logged in."}), 400
-   
 			if not bcrypt.checkpw(data["password"].encode('utf-8'), password_hash.encode('utf-8')):
 				return jsonify({"error": "Invalid username or password."}), 401
 			
@@ -76,10 +66,11 @@ class SessionController:
 				"password"
 			]
 		)
+  
 		if error:
-			return jsonify({"error": error}), 400
+			return None, error
 
-		return None
+		return data, None
 
 	@staticmethod
 	def _logout():

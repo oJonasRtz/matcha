@@ -8,7 +8,7 @@ class Server:
         self.routes = Routes()
         
         set_middlewares(self.app, self.routes.get_public_routes())
-        self._set_upload_limit(10)
+        self._set_upload_limit(10) # Set upload limit to 10 MB
         self.routes.load_routes(self.app)
         self._set_error_handlers()
 

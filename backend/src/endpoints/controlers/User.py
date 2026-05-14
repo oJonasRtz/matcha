@@ -4,6 +4,7 @@ from src.endpoints.utils.check_strong_password import is_strong_password
 from src.objects.Database import Database
 from flask import jsonify
 from src.endpoints.utils.generate_jwt import generate_jwt
+from flask import g
 
 class UserController:
 	@classmethod
@@ -32,30 +33,18 @@ class UserController:
 			}
 		)
 		if error:
-			return jsonify({"error": error}), 400
+			return None, error
 
 		password = data["password"]
 		if not is_strong_password(password):
 			return jsonify({"error": "Weak password."}), 400
       
-		return None
+		return data, None
 
 	@staticmethod
 	def _register():
-		data, error = get_body(
-			required_fields=[
-	   			"username",
-		  		"password",
-				"email",
-			 	"firstname",
-			  	"lastname",
-			   	"gender"
-			],
-			optional_fields={
-				"sexual_orientation": "bisexual",
-			}
-		)
-		
+		data = g.body
+  
 		password = data["password"]
 		hashed_password = bcrypt.hashpw(
 				password.encode('utf-8'),

@@ -1,6 +1,6 @@
 services:
   apache:
-    image: httpd:latest
+    build: ./server
     ports:
       - "80:80"
       - "443:443"
@@ -39,7 +39,7 @@ services:
       - db_network
   
   database:
-    image: postgres:latest
+    build: ./database
     networks:
       - db_network
     volumes:
