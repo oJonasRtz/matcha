@@ -2,6 +2,8 @@ import os
 from flask import Flask, jsonify, request, g
 import src.endpoints.utils.logout as logout
 import jwt
+from src.endpoints.controlers.User import UserController
+from src.endpoints.controlers.Session import SessionController
 
 def set_middlewares(app, pub_routes):
     if not app or not isinstance(app, Flask) or not isinstance(pub_routes, list):
@@ -44,3 +46,23 @@ def set_middlewares(app, pub_routes):
         except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token"}), 401
         
+    @app.before_request
+    def validator():
+        
+        # <route, method>: validator_function
+        val = {
+            "/sessions/login": SessionController.login_validator,
+            "/sessions/logout": None,  # No validation needed for logout since it just checks the token
+            "/user/register": UserController.register_validator,
+        }
+        
+        route = request.path
+        if route not in val:        
+            return jsonify({"error": "Validator not found"}), 500    
+        
+        validate = val[route]
+        
+        if validate:
+            return validate()
+        
+        return None
