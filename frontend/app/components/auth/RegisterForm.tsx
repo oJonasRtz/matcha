@@ -17,6 +17,8 @@ export default function RegisterForm() {
       sexual_orientation: data.sexualOrientation,
     };
 
+
+    console.log("Payload:", payload);
     if (data.password !== data.confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -29,13 +31,14 @@ export default function RegisterForm() {
       },
       body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
-      .then(({data, res}) => {
+      .then(async (res) => {
+        const data = await res.json();
+    
         if (res.ok) {
           alert("Registration successful!");
           router.push("/login");
         } else {
-          alert(`Registration failed: ${data.message}`);
+          alert(`Registration failed: ${data.message || "Unknown error"}`);
         }
       })
       .catch((err) => {

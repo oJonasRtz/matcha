@@ -17,7 +17,7 @@ up: check-env tls
 
 down:
 	@echo "${YELLOW}===== Stopping the services... =====${RESET}"
-	@$(COMPOSE) down -v
+	@$(COMPOSE) down
 
 clean: down
 	@echo "${GREEN}===== Cleaning the services... =====${RESET}"

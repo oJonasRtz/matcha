@@ -86,7 +86,7 @@ class UserController:
 			)
 			public_id = user[0]
 			token = generate_jwt(public_id)
-			return jsonify({token}), 201
+			return jsonify({"token" : token}), 201
 		except Exception as e:
 			return jsonify({"error": "Something went wrong: " + str(e)}), 400
       
