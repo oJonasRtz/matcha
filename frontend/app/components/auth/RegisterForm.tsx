@@ -36,7 +36,7 @@ export default function RegisterForm() {
     
         if (res.ok) {
           alert("Registration successful!");
-          router.push("/login");
+          router.push("/dashboard");
         } else {
           alert(`Registration failed: ${data.message || "Unknown error"}`);
         }
