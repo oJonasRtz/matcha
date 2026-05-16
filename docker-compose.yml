@@ -25,6 +25,8 @@ services:
       - "3000"
     networks:
       - default
+    env_file:
+      - ./frontend/.env
 
   backend:
     build: ./backend
@@ -37,7 +39,9 @@ services:
     networks:
       - default
       - db_network
-  
+    env_file:
+      - ./backend/.env
+
   database:
     build: ./database
     networks:

@@ -70,9 +70,9 @@ class UserController:
 				)
 				INSERT INTO auth (user_id, password_hash)
 				SELECT id, %s
-    			FROM new_user
+				FROM new_user
 				RETURNING (SELECT public_id FROM new_user)
-	   			""",
+				""",
 				(
 					data["username"],
 					data["email"],
@@ -86,8 +86,8 @@ class UserController:
 			)
 			public_id = user[0]
 			token = generate_jwt(public_id)
-			return jsonify({"token": token}), 201
-		except Exception:
-			return jsonify({"error": "Something went wrong."}), 400
+			return jsonify({token}), 201
+		except Exception as e:
+			return jsonify({"error": "Something went wrong: " + str(e)}), 400
       
 		
