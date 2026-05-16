@@ -17,35 +17,37 @@ class UserController:
 	def get_private_routes(cls):
 		return []
 
-	@staticmethod
-	def register_validator():
-		data, error = get_body(
-			required_fields=[
-	   			"username",
-		  		"password",
-				"email",
-			 	"firstname",
-			  	"lastname",
-			   	"gender"
-			],
-			optional_fields={
-				"sexual_orientation": "bisexual",
-			}
-		)
-		if error:
-			return None, error
+	# @staticmethod
+	# def register_validator():
+	# 	data, error = get_body(
+	# 		required_fields=[
+	#    			"username",
+	# 	  		"password",
+	# 			"email",
+	# 		 	"firstname",
+	# 		  	"lastname",
+	# 		   	"gender"
+	# 		],
+	# 		optional_fields={
+	# 			"sexual_orientation": "bisexual",
+	# 		}
+	# 	)
+	# 	if error:
+	# 		return None, error
 
-		password = data["password"]
-		if not is_strong_password(password):
-			return jsonify({"error": "Weak password."}), 400
+	# 	password = data["password"]
+	# 	if not is_strong_password(password):
+	# 		return jsonify({"error": "Weak password."}), 400
       
-		return data, None
+	# 	return data, None
 
 	@staticmethod
 	def _register():
 		data = g.body
   
 		password = data["password"]
+		if not is_strong_password(password):
+			return jsonify({"error": "Weak password."}), 400
 		hashed_password = bcrypt.hashpw(
 				password.encode('utf-8'),
 				bcrypt.gensalt()

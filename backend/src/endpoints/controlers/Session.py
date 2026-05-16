@@ -58,19 +58,19 @@ class SessionController:
 		except Exception as e:
 			return jsonify({"error": f"Login failed. {str(e)}"}), 400
 
-	@staticmethod
-	def login_validator(req):
-		data, error = get_body(
-			required_fields=[
-				"username",
-				"password"
-			]
-		)
+	# @staticmethod
+	# def login_validator(req):
+	# 	data, error = get_body(
+	# 		required_fields=[
+	# 			"username",
+	# 			"password"
+	# 		]
+	# 	)
   
-		if error:
-			return None, error
+	# 	if error:
+	# 		return None, error
 
-		return data, None
+	# 	return data, None
 
 	@staticmethod
 	def _logout():
