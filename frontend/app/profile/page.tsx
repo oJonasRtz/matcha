@@ -2,8 +2,9 @@ import UserImages from "../components/profile/showImages";
 import UserInfo from "../components/profile/userInfo";
 import { Card } from "../components/public/card";
 import Sidebar from "../components/users/sidebar";
+import { UserData } from "../swipe/page";
 
-const userData = {
+const userData: UserData = {
 	name: "Luna",
 	age: 27,
 	location: "Recife - PE, Brazil",
