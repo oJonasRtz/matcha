@@ -1,33 +1,36 @@
+import { cookies } from "next/headers";
+
 export async function POST(req: Request) {
 	const body = await req.json();
 
-	let res;
+	const res = await fetch("https://backend:5000/user/register", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(body)
+	});
 
-	try {
-		res = await fetch("https://backend:5000/user/register", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(body)
+	const text = await res.text();
+	const data = text ? JSON.parse(text) : {};
+
+	if (!res.ok) {
+		return new Response(JSON.stringify(data), {
+			status: res.status
 		});
-	} catch (err) {
-		return new Response(JSON.stringify({
-			error: "Backend unreachable"
-		}), { status: 500 });
 	}
+	// JWT on cookies
+	const cookieStore = await cookies();
 
-	let data = null;
+	cookieStore.set("token", data.token, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		path: "/",
+		maxAge: 60 * 60 * 24, // 1 day
+	});	
 
-	try {
-		data = await res.json();
-	} catch {
-		data = null;
-	}
-
-	return new Response(JSON.stringify(data || {
-		error: "Invalid response from backend"
-	}), {
-		status: res.status || 500
+	return new Response(JSON.stringify({ success: true }), {
+		status: 201
 	});
 }

@@ -4,6 +4,7 @@ from src.endpoints.utils.check_strong_password import is_strong_password
 from src.objects.Database import Database
 from flask import jsonify
 from src.endpoints.utils.generate_jwt import generate_jwt
+from flask import g
 
 class UserController:
 	@classmethod
@@ -16,25 +17,34 @@ class UserController:
 	def get_private_routes(cls):
 		return []
 
+	# @staticmethod
+	# def register_validator():
+	# 	data, error = get_body(
+	# 		required_fields=[
+	#    			"username",
+	# 	  		"password",
+	# 			"email",
+	# 		 	"firstname",
+	# 		  	"lastname",
+	# 		   	"gender"
+	# 		],
+	# 		optional_fields={
+	# 			"sexual_orientation": "bisexual",
+	# 		}
+	# 	)
+	# 	if error:
+	# 		return None, error
+
+	# 	password = data["password"]
+	# 	if not is_strong_password(password):
+	# 		return jsonify({"error": "Weak password."}), 400
+      
+	# 	return data, None
+
 	@staticmethod
 	def _register():
-		data, error = get_body(
-			required_fields=[
-	   			"username",
-		  		"password",
-				"email",
-			 	"firstname",
-			  	"lastname",
-			   	"gender"
-			],
-			optional_fields={
-				"sexual_orientation": "bisexual",
-			}
-		)
-		if error:
-			return jsonify({"error": error}), 400
-		
-		#strong password check
+		data = g.body
+  
 		password = data["password"]
 		if not is_strong_password(password):
 			return jsonify({"error": "Weak password."}), 400
@@ -60,9 +70,9 @@ class UserController:
 				)
 				INSERT INTO auth (user_id, password_hash)
 				SELECT id, %s
-    			FROM new_user
+				FROM new_user
 				RETURNING (SELECT public_id FROM new_user)
-	   			""",
+				""",
 				(
 					data["username"],
 					data["email"],
@@ -76,8 +86,8 @@ class UserController:
 			)
 			public_id = user[0]
 			token = generate_jwt(public_id)
-			return jsonify({"token": token}), 201
-		except Exception:
-			return jsonify({"error": "Something went wrong."}), 400
+			return jsonify({"token" : token}), 201
+		except Exception as e:
+			return jsonify({"error": "Something went wrong: " + str(e)}), 400
       
 		

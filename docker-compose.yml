@@ -1,6 +1,6 @@
 services:
   apache:
-    image: httpd:latest
+    build: ./server
     ports:
       - "80:80"
       - "443:443"
@@ -25,6 +25,8 @@ services:
       - "3000"
     networks:
       - default
+    env_file:
+      - ./frontend/.env
 
   backend:
     build: ./backend
@@ -37,9 +39,11 @@ services:
     networks:
       - default
       - db_network
-  
+    env_file:
+      - ./backend/.env
+
   database:
-    image: postgres:latest
+    build: ./database
     networks:
       - db_network
     volumes:

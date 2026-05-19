@@ -6,4 +6,4 @@ class MatchesController:
 	
 	@classmethod
 	def get_private_routes(cls):
-		return [];
+		return []
