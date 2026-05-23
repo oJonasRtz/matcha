@@ -73,6 +73,7 @@ def set_middlewares(app, pub_routes):
                 "optional_fields": {}
             },
             "/sessions/logout": None,  # No validation needed for logout since it just checks the token
+            "/sessions/check": None,  # No validation needed for check user since it just checks the token
             "/user/register": {
                 "required_fields": ["username", "password", "email", "firstname", "lastname", "gender"],
                 "optional_fields": {"sexual_orientation": "bisexual"}

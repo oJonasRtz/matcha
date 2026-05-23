@@ -27,7 +27,6 @@ clean: down
 
 fclean: clean
 	@echo "${RED}===== Erasing everything... =====${RESET}"
-	@docker system prune -a -f matcha_db_data || true 
 	@rm -f ./server/certificates/*.crt
 	@rm -f ./server/certificates/*.key
 	@rm -f backend/.env

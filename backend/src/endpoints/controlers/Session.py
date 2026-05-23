@@ -15,9 +15,16 @@ class SessionController:
 	@classmethod
 	def get_private_routes(cls):
 		return [
-			("/sessions/logout", cls._logout, ["POST"], "logout")
+			("/sessions/logout", cls._logout, ["POST"], "logout"),
+			("/sessions/check", cls._check_user, ["GET"], "check_user")
 		]
 	
+	@staticmethod
+	def _check_user():
+		if not g.user:
+			return jsonify({"error": "Unauthorized"}), 401
+		return jsonify({"message": "ok"}), 200
+ 
 	@staticmethod
 	def _login():
 		data = g.body
