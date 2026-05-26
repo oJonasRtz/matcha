@@ -25,7 +25,14 @@ clean: down
 	@docker container prune -f
 	@docker network prune -f
 
-fclean: clean
+fclean:
+	@$(COMPOSE) down -v
+
+	@echo "${GREEN}===== Cleaning the services... =====${RESET}"
+	@docker image prune -a -f
+	@docker container prune -f
+	@docker network prune -f
+
 	@echo "${RED}===== Erasing everything... =====${RESET}"
 	@rm -f ./server/certificates/*.crt
 	@rm -f ./server/certificates/*.key

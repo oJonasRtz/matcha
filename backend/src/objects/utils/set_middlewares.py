@@ -69,8 +69,11 @@ def set_middlewares(app, pub_routes):
         #   error[if something happens]
         val = {
             "/sessions/login": {
-                "required_fields": ["username", "password"],
-                "optional_fields": {}
+                "required_fields": ["password"],
+                "optional_fields": {
+                    "username": None,
+                    "email": None,
+                }
             },
             "/sessions/logout": None,  # No validation needed for logout since it just checks the token
             "/sessions/check": None,  # No validation needed for check user since it just checks the token

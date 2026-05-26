@@ -1,6 +1,7 @@
 "use client";
 
 import { FloatingLabelInput } from "../input/floatingLabel";
+import PasswordInput from "../input/password";
 import { Card } from "../public/card";
 import { useRouter } from "next/navigation";
 
@@ -28,8 +29,7 @@ export default function ModLoginForm() {
 					required
 				/>
 
-				<FloatingLabelInput
-					type="password"
+				<PasswordInput
 					name="password"
 					id="password"
 					label="Password"
@@ -41,6 +41,10 @@ export default function ModLoginForm() {
 					Login
 				</button>
 			</form>
+
+			<footer className="border-t border-gray-600 mt-6 text-sm text-gray-400">
+				<p>Only authorized moderators can access this page.</p>
+			</footer>
 		</Card>
 	)
 }

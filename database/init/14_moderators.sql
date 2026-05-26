@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS moderators (
 	public_id UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
 	username VARCHAR(255) UNIQUE NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
-	password_hash VARCHAR(255) NOT NULL,
+	password_hash VARCHAR(255) NOT NULL
 );

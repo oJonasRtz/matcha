@@ -28,16 +28,30 @@ class SessionController:
 	@staticmethod
 	def _login():
 		data = g.body
-
-		try:
-			user = Database.run_query(
-				"""
+		query = {
+			"email": """
+				SELECT u.id, u.public_id, a.password_hash, u.is_online
+				FROM users u
+				JOIN auth a ON u.id = a.user_id
+				WHERE u.email = %s
+	   			""",
+			"username": """
 				SELECT u.id, u.public_id, a.password_hash, u.is_online
 				FROM users u
 				JOIN auth a ON u.id = a.user_id
 				WHERE u.username = %s
 	   			""",
-				(data["username"],),
+		}
+
+		if data["email"] is None and data["username"] is None:
+			return jsonify({"error": "Either username or email is required."}), 400
+		
+		identifier = "email" if data["email"] is not None else "username"
+
+		try:
+			user = Database.run_query(
+				query[identifier],
+				(data[identifier],),
 				fetch_one=True
 			)
 			if not user:

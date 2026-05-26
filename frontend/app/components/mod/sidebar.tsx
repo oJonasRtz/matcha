@@ -56,7 +56,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 									desktopButton,
 									isActive ? blueActive : blueHover,
 								].join(" ")}
-							>
+							>g
 								<Icon className={iconSize} />
 								<span className="sr-only">{title}</span>
 							</button>

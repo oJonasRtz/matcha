@@ -1,334 +1,314 @@
 "use client";
 
-import { Card } from "../public/card";
-import React from "react";
 import { useRouter } from "next/navigation";
+import React, { useRef, useState } from "react";
+import { FloatingLabelInput } from "../input/floatingLabel";
+import PasswordInput from "../input/password";
+import RadioGroup from "../input/radioGroup";
+import { Card } from "../public/card";
+
+type RegisterFormData = {
+	email: string;
+	username: string;
+	firstname: string;
+	lastname: string;
+	password: string;
+	confirmPassword: string;
+	gender: string;
+	sexualOrientation: string;
+};
 
 export default function RegisterForm() {
-  const router = useRouter();
+	const router = useRouter();
+	const formRef = useRef<HTMLFormElement>(null);
+	const [currentStep, setCurrentStep] = useState(0);
+	const [formData, setFormData] = useState<RegisterFormData>({
+		email: "",
+		username: "",
+		firstname: "",
+		lastname: "",
+		password: "",
+		confirmPassword: "",
+		gender: "",
+		sexualOrientation: "",
+	});
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
+	const sexualOrientations = [
+		{ value: "heterosexual", label: "Heterosexual" },
+		{ value: "bisexual", label: "Bisexual" },
+		{ value: "homosexual", label: "Homosexual" },
+	];
+	const steps = ["Profile", "Security", "Details"];
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+	// Password strength checker (same rules as backend)
+	function isStrongPassword(password: string) {
+		if (!password) return false;
+		const special = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/";
+		return (
+			password.length >= 8 &&
+			[...password].some((c) => c >= "A" && c <= "Z") &&
+			[...password].some((c) => c >= "a" && c <= "z") &&
+			[...password].some((c) => c >= "0" && c <= "9") &&
+			[...password].some((c) => special.includes(c))
+		);
+	}
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
-    const payload = {
-      ...data,
-      sexual_orientation: data.sexualOrientation,
-    };
+	const postFormLinks = [
+		{ label: "Login", action: () => router.push("/login"), className: "font-semibold text-white" },
+	];
 
+	const footerLinks = [
+		{ label: "Terms of Service", action: () => router.push("#") },
+		{ label: "Privacy Policy", action: () => router.push("#") },
+	];
 
-    console.log("Payload:", payload);
-    if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
 
-    fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then(async (res) => {
-        const data = await res.json();
-    
-        if (res.ok) {
-          alert("Registration successful!");
-          router.push("/dashboard");
-        } else {
-          alert(`Registration failed: ${data.message || "Unknown error"}`);
-        }
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-        alert("An error occurred during registration.");
-      });
-  }
+		// Build standardized payload for backend route /user/register
+		const payload = {
+			username: formData.username,
+			password: formData.password,
+			email: formData.email,
+			firstname: formData.firstname,
+			lastname: formData.lastname,
+			gender: formData.gender,
+			// optional with default
+			sexual_orientation: formData.sexualOrientation || "bisexual",
+		};
 
-  return (
-    <Card className="max-w-md">
-      <h1 className="mb-6 text-center text-white text-3xl font-bold">Register</h1>
+		// Ensure required fields
+		const missing = ["username", "password", "email", "firstname", "lastname", "gender"].filter((k) => !payload[k as keyof typeof payload]);
+		if (missing.length) {
+			setError(`Missing required fields: ${missing.join(", ")}`);
+			return;
+		}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-1.75">
-        <div className="relative">
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder=" "
-            className="peer w-full text-white font-bold rounded-xl border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-	<label
-    	     htmlFor="email"
-    	     className="pointer-events-none absolute left-4
-      		top-2 translate-y-0
-      		text-sm font-semibold text-white
-      		transition-all duration-200
+		// Use the backend route proxied by Next.js
+		fetch(`/api/register`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		})
+			.then(async (res) => {
+				// Read raw text first but never expose it to the user — only log for diagnostics
+				let text = "";
+				let responseData: any = {};
+				try {
+					text = await res.text();
+					responseData = text ? JSON.parse(text) : {};
+				} catch (parseErr) {
+					responseData = { raw: text };
+				}
 
-      		peer-placeholder-shown:top-1/2
-      		peer-placeholder-shown:-translate-y-1/2
-      		peer-placeholder-shown:text-base
+				if (res.ok) {
+					setSuccess("Registration successful!");
+					setError(null);
+					setTimeout(() => router.push("/dashboard"), 500);
+				} else {
+					setError("Registration failed. Please check your details and try again.");
+				}
+			})
+			.catch((err) => {
+				setError("Registration failed. Please try again later.");
+			});
+	}
 
-      		peer-focus:top-2
-      		peer-focus:translate-y-0
-      		peer-focus:text-sm
-      		peer-focus:text-red-500
+	function handleBackStep() {
+		setCurrentStep((step: number) => Math.max(step - 1, 0));
+	}
 
-		peer-not-placeholder-shown:top-2
-	        peer-not-placeholder-shown:translate-y-0
-   	        peer-not-placeholder-shown:text-sm
-		peer-not-placeholder-shown:text-pink-400"
-  	>
-    		Email
-  	</label>
-        </div>
+	function handleNextStep() {
+		if (!formRef.current?.reportValidity()) {
+			return;
+		}
 
-<div className="relative">
-          <input
-            id="username"
-            name="username"
-            type="text"
-            placeholder=" "
-            className="peer w-full text-gray font-bold rounded-xl border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-        <label
-             htmlFor="username"
-             className="pointer-events-none absolute left-4
-                top-2 translate-y-0
-                text-sm font-bold text-white
-                transition-all duration-200
+		// If we're on the security step, enforce strong password before advancing
+		if (currentStep === 1) {
+			if (!isStrongPassword(formData.password)) {
+				setError("Please choose a stronger password meeting all requirements.");
+				return;
+			}
+			if (formData.password !== formData.confirmPassword) {
+				setError("Passwords do not match!");
+				return;
+			}
+		}
 
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-base
+		setCurrentStep((step: number) => Math.min(step + 1, 2));
+	}
 
-                peer-focus:top-2
-                peer-focus:translate-y-0
-                peer-focus:text-sm
-                peer-focus:text-red-500
+	function updateField(field: keyof RegisterFormData, value: string) {
+		setFormData((current: RegisterFormData) => ({
+			...current,
+			[field]: value,
+		}));
+		// clear visual errors while user types
+		if (error) setError(null);
+		if (success) setSuccess(null);
+	}
 
-		peer-not-placeholder-shown:top-2
-                peer-not-placeholder-shown:translate-y-0
-                peer-not-placeholder-shown:text-sm
-                peer-not-placeholder-shown:text-pink-400"
-        >
-                Username
-        </label>
-        </div>
+	function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+		if (!isThirdStep) {
+			e.preventDefault();
+			return;
+		}
 
+		handleSubmit(e);
+	}
 
-<div className="relative">
-          <input
-            id="firstname"
-            name="firstname"
-            type="text"
-            placeholder=" "
-            className="peer w-full rounded-xl text-gray font-bold border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-          <label
-            htmlFor="firstname"
-                className="pointer-events-none absolute left-4
-                top-2 translate-y-0
-                text-sm font-bold text-white
-                transition-all duration-200
+	const isFirstStep = currentStep === 0;
+	const isSecondStep = currentStep === 1;
+	const isThirdStep = currentStep === 2;
 
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-base
+	const isPasswordStrong = isStrongPassword(formData.password);
+	const passwordsMatch = formData.password === formData.confirmPassword;
 
-                peer-focus:top-2
-                peer-focus:translate-y-0
-                peer-focus:text-sm
-                peer-focus:text-red-500
+	return (
+		<Card className="max-w-md">
+			<h1 className="mb-6 text-center text-white text-3xl font-bold">Register</h1>
 
-		peer-not-placeholder-shown:top-2
-                peer-not-placeholder-shown:translate-y-0
-                peer-not-placeholder-shown:text-sm
-                peer-not-placeholder-shown:text-pink-400"
-          >
-            Firstname
-          </label>
-        </div>
+			{error ? (
+				<div className="mb-4 rounded-md bg-red-600/20 border border-red-600 px-4 py-2 text-sm text-red-100">
+					{error}
+				</div>
+			) : null}
 
-<div className="relative">
-          <input
-            id="lastname"
-            name="lastname"
-            type="text"
-            placeholder=" "
-            className="peer w-full rounded-xl font-bold text-gray border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-          <label
-            htmlFor="lastname"
-                className="pointer-events-none absolute left-4
-                top-2 translate-y-0
-                text-sm font-semibold text-white
-                transition-all duration-200
+			{success ? (
+				<div className="mb-4 rounded-md bg-green-600/20 border border-green-600 px-4 py-2 text-sm text-green-100">
+					{success}
+				</div>
+			) : null}
 
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-base
+				<div className="mb-6 flex items-center justify-center gap-2 text-xs font-semibold text-white/60">
+					{steps.map((step, index) => (
+						<div
+							key={step}
+							className={`rounded-full px-3 py-1 transition ${
+								index === currentStep ? "bg-red-500 text-white" : "bg-white/10 text-white/60"
+							}`}
+						>
+							{index + 1}. {step}
+						</div>
+					))}
+				</div>
 
-                peer-focus:top-2
-                peer-focus:translate-y-0
-                peer-focus:text-sm
-                peer-focus:text-red-500
+				<form ref={formRef} onSubmit={handleFormSubmit} className="flex flex-col gap-1.75">
+					{isFirstStep ? (
+						<>
+							<FloatingLabelInput id="email" name="email" type="email" label="Email" value={formData.email} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("email", event.target.value)} className="w-full text-white font-bold" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
+							<FloatingLabelInput id="username" name="username" type="text" label="Username" value={formData.username} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("username", event.target.value)} className="w-full text-gray font-bold" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
+							<FloatingLabelInput id="firstname" name="firstname" type="text" label="Firstname" value={formData.firstname} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("firstname", event.target.value)} className="w-full rounded-xl text-gray font-bold" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
+							<FloatingLabelInput id="lastname" name="lastname" type="text" label="Lastname" value={formData.lastname} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("lastname", event.target.value)} className="w-full rounded-xl font-bold text-gray" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
+						</>
+					) : null}
 
-		peer-not-placeholder-shown:top-2
-                peer-not-placeholder-shown:translate-y-0
-                peer-not-placeholder-shown:text-sm
-                peer-not-placeholder-shown:text-pink-400"
-          >
-            Lastname
-          </label>
-        </div>
+					{isSecondStep ? (
+						<>
+							<PasswordInput id="password" name="password" label="Password" value={formData.password} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("password", event.target.value)} className="w-full rounded-xl text-gray" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" buttonFocusClassName="focus:ring-red-200/40" required />
+							<PasswordInput id="confirmPassword" name="confirmPassword" label="Confirm Password" value={formData.confirmPassword} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("confirmPassword", event.target.value)} className="w-full rounded-xl font-bold text-white" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" buttonFocusClassName="focus:ring-red-200/40" required />
 
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder=" "
-            className="peer w-full rounded-xl text-gray border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-          <label
-            htmlFor="password"
-		className="pointer-events-none absolute left-4
-                top-2 translate-y-0
-                text-sm font-semibold text-white
-                transition-all duration-200
+							{/* Password strength marker */}
+							<div className="mt-3 rounded-md bg-white/5 p-3 text-sm text-white/80">
+								<div className="font-semibold mb-2">Password requirements</div>
+								<ul className="grid grid-cols-1 gap-1">
+									<li className={`${formData.password.length >= 8 ? "text-green-400" : "text-white/60"}`}>{formData.password.length >= 8 ? "✔" : "○"} At least 8 characters</li>
+									<li className={`${/[A-Z]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[A-Z]/.test(formData.password) ? "✔" : "○"} One uppercase letter</li>
+									<li className={`${/[a-z]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[a-z]/.test(formData.password) ? "✔" : "○"} One lowercase letter</li>
+									<li className={`${/[0-9]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[0-9]/.test(formData.password) ? "✔" : "○"} One digit</li>
+											<li className={`${/[!@#$%^&*()\-_=+\[\]{}|;:'",.<>?\/]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[!@#$%^&*()\-_=+\[\]{}|;:'",.<>?\/]/.test(formData.password) ? "✔" : "○"} One special character</li>
+											<li className={`${passwordsMatch ? "text-green-400" : "text-white/60"}`}>{passwordsMatch ? "✔" : "○"} Passwords match</li>
+								</ul>
+							</div>
+						</>
+					) : null}
 
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-base
+					{isThirdStep ? (
+						<>
+							<RadioGroup
+								name="gender"
+								title="Gender"
+								options={[
+									{ value: "male", label: "Male" },
+									{ value: "female", label: "Female" },
+									{ value: "other", label: "Other" },
+								]}
+								value={formData.gender}
+								onChange={(v) => updateField("gender", v)}
+								required
+								activeClassName={"bg-red-500 text-white"}
+								focusRingClassName={"focus-within:ring-2 focus-within:ring-red-200/40"}
+								ringClassName={"ring-red-400/60"}
+							/>
 
-                peer-focus:top-2
-                peer-focus:translate-y-0
-                peer-focus:text-sm
-                peer-focus:text-red-500
+							<div className="mt-4" />
 
-		peer-not-placeholder-shown:top-2
-                peer-not-placeholder-shown:translate-y-0
-                peer-not-placeholder-shown:text-sm
-                peer-not-placeholder-shown:text-pink-400"
-          >
-            Password
-          </label>
-        </div>
+							<RadioGroup
+								name="sexualOrientation"
+								title="Sexual Orientation"
+								options={sexualOrientations}
+								value={formData.sexualOrientation}
+								onChange={(v) => updateField("sexualOrientation", v)}
+								required
+								activeClassName={"bg-red-500 text-white"}
+								focusRingClassName={"focus-within:ring-2 focus-within:ring-red-200/40"}
+								ringClassName={"ring-red-400/60"}
+							/>
+						</>
+					) : null}
 
-	<div className="relative">
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            placeholder=" "
-            className="peer w-full rounded-xl font-bold text-white border border-gray-300 px-4 pb-3 pt-6 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-blue-200"
-            required
-          />
-          <label
-            htmlFor="confirmPassword"
-                className="pointer-events-none absolute left-4
-                top-2 translate-y-0
-                text-sm font-semibold text-white
-                transition-all duration-200
+					<div className="mt-2 flex gap-3">
+						{!isFirstStep ? (
+							<button type="button" onClick={handleBackStep} className="w-full rounded-xl border border-white/20 px-4 py-3 font-semibold text-white transition hover:bg-white/10">
+								Back
+							</button>
+						) : null}
 
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-base
+						{isThirdStep ? (
+							<button
+								type="submit"
+								className={`w-full rounded-xl px-4 py-3 font-semibold text-white transition ${
+									!formRef.current?.reportValidity() ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+								}`}
+								disabled={!formRef.current?.reportValidity()}
+							>
+								Submit
+							</button>
+						) : (
+							<button
+								type="button"
+								onClick={handleNextStep}
+								className={`w-full rounded-xl px-4 py-3 font-semibold text-white transition ${
+									currentStep === 1 && (!isPasswordStrong || !passwordsMatch) ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+								}`}
+								disabled={currentStep === 1 && (!isPasswordStrong || !passwordsMatch)}
+							>
+								Next
+							</button>
+						)}
+					</div>
+				</form>
 
-                peer-focus:top-2
-                peer-focus:translate-y-0
-                peer-focus:text-sm
-                peer-focus:text-red-500
+			<div className="mt-5 flex flex-col items-center gap-4 text-sm">
+				{postFormLinks.map((link) => (
+					<button key={link.label} onClick={link.action} className={`${link.className} transition hover:text-red-300 hover:underline`}>
+						<strong>{link.label}</strong>
+					</button>
+				))}
+			</div>
 
-		peer-not-placeholder-shown:top-2
-                peer-not-placeholder-shown:translate-y-0
-                peer-not-placeholder-shown:text-sm
-                peer-not-placeholder-shown:text-pink-400"
-          >
-            Confirm Password
-          </label>
-        </div>
-
-    <div className="text-center space-y-2">
-  	<p className="text-sm font-semibold text-white">Gender</p>
-
-  	<div className="flex text-center justify-center flex-wrap gap-12 text-white">
-    		<label className="flex text-center items-center gap-3">
-      			<input type="radio" name="gender" value="male" required/>
-      			<strong>Male</strong>
-    		</label>
-
-    		<label className="flex text-center items-center gap-2">
-      			<input type="radio" name="gender" value="female" />
-      			<strong>Female</strong>
-    		</label>
-		<label className="flex text-center justify-center items-center gap-2">
-                	<input type="radio" name="gender" value="other" />
-                	<strong>Other</strong>
-        	</label>
-  </div>
-
-</div>
-
-<div className="text-center space-y-2">
-        <p className="text-sm font-semibold text-white">Sexual Orientation</p>
-
-        <div className="flex text-center justify-center flex-wrap gap-6 text-white">
-                <label className="flex text-center items-center gap-3">
-                        <input type="radio" name="sexualOrientation" value="heterosexual" required/>
-                        <strong>Heterosexual</strong>
-                </label>
-
-                <label className="flex text-center items-center gap-2">
-                        <input type="radio" name="sexualOrientation" value="bisexual" />
-                        <strong>Bisexual</strong>
-                </label>
-                <label className="flex text-center justify-center items-center gap-2">
-                        <input type="radio" name="sexualOrientation" value="homosexual" />
-                        <strong>Homosexual</strong>
-                </label>
-  </div>
-</div>
-        <button
-          type="submit"
-          className="mt-2 rounded-xl bg-blue-500 px-4 py-3 font-semibold text-white transition hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </form>
-      <div className="mt-5 flex flex-col items-center gap-4 text-sm">
-        <button
-          onClick={() => router.push("#")}
-          className="text-white/80 transition hover:text-blue-300 hover:underline"
-        >
-          <strong>Forgot password?</strong>
-        </button>
-
-        <button
-          onClick={() => router.push("/login")}
-          className="font-semibold text-white transition hover:text-blue-300 hover:underline"
-        >
-          <strong>Login</strong>
-        </button>
-      </div>
-      <footer className="mt-4 border-t border-white/20 pt-4">
-        <div className="flex justify-center gap-4 text-xs text-white/70">
-          <button onClick={() => router.push("#")} className="transition hover:text-blue-300 hover:underline">
-            <strong>Terms of Service</strong>
-          </button>
-          <button onClick={() => router.push("#")} className="transition hover:text-blue-300 hover:underline">
-            <strong>Privacy Policy</strong>
-          </button>
-        </div>
-      </footer>
-    </Card>
-  );
+			<footer className="mt-4 border-t border-white/20 pt-4">
+				<div className="flex justify-center gap-4 text-xs text-white/70">
+					{footerLinks.map((link) => (
+						<button key={link.label} onClick={link.action} className="transition hover:text-red-300 hover:underline">
+							<strong>{link.label}</strong>
+						</button>
+					))}
+				</div>
+			</footer>
+		</Card>
+	);
 }
