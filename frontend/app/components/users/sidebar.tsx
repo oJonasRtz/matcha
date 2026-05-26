@@ -27,24 +27,24 @@ export default function Sidebar({ children }: { children: ReactNode }) {
   // ===== ASIDE =====
   const asideStyle =
   // Mobile
-  "fixed bottom-0 left-0 w-full h-20 flex flex-row items-center border-t z-50 bg-black/30 backdrop-blur-md border-white/20 " +
+  "fixed bottom-0 left-0 z-50 flex h-20 w-full flex-row items-center border-t border-white/20 bg-black/30 backdrop-blur-md " +
   // Desktop
-  "md:top-0 md:h-screen md:w-20 md:flex-col md:border-r md:py-6 md:gap-6";
+  "md:top-0 md:h-screen md:w-24 md:flex-col md:border-r md:border-t-0 md:px-3 md:py-6 md:gap-4";
 
   // ===== NAV =====
   const navStyle =
     // mobile
-    "flex w-full h-full flex-row " +
+    "flex h-full w-full flex-row md:flex-col md:items-center md:w-full md:flex-1 md:gap-3" +
     // desktop
-    "md:flex-col md:items-center md:w-auto";
+    "";
 
   // ===== BUTTON BASE =====
   const baseButton =
-    "flex items-center justify-center rounded-2xl p-3 transition";
+    "flex items-center justify-center rounded-2xl transition duration-200";
 
   // ===== VARIANTS =====
-  const mobileButton = "flex-1"; // horizontal expansion
-  const desktopButton = "md:mt-1";
+  const mobileButton = "flex-1 md:flex-none"; // horizontal expansion
+  const desktopButton = "h-12 w-12 md:mx-auto";
 
   // ===== COLORS =====
   const pinkHover = "text-white/80 hover:bg-white/10 hover:text-pink-400 cursor-pointer";
@@ -60,20 +60,12 @@ export default function Sidebar({ children }: { children: ReactNode }) {
     { icon: User, title: "Dashboard", ref: "/dashboard", variant: pinkHover, handler: () => router.push("/dashboard") },
     { icon: Globe, title: "Discover", ref: "/discover", variant: pinkHover, handler: () => router.push("/discover") },
     { icon: Settings, title: "Settings", ref: "/settings", variant: pinkHover, handler: () => router.push("/settings") },
-    {
-      icon: LogOut,
-      title: "Logout",
-      ref: "/",
-      variant: redHover,
-      extra: "md:mt-auto", // desktop only
-      handler: handleLogout
-    },
   ];
 
-  const spaceLayout = "flex flex-1 min-h-0 pb-20 md:pb-0 md:pl-20"; //
+  const spaceLayout = "flex flex-1 min-h-0 pb-20 md:pb-0 md:pl-24"; //
 
   return (
-    <div className="flex w-screen h-screen">
+    <div className="relative flex min-h-screen w-full text-white">
       <aside className={asideStyle}>
         <nav className={navStyle}>
           {icons.map(({ icon: Icon, title, ref, variant, extra, handler }, i) => {
@@ -88,7 +80,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
                   baseButton,
                   mobileButton,
                   desktopButton,
-                  isActive ? "text-pink-400 bg-white/10" : variant,
+                  isActive ? "text-pink-400 bg-white/10 shadow-lg shadow-pink-500/20" : variant,
                   extra,
                 ].join(" ")}
               >
@@ -101,6 +93,22 @@ export default function Sidebar({ children }: { children: ReactNode }) {
               </button>
             );
         })}
+
+          <button
+            type="button"
+            title="Logout"
+            onClick={handleLogout}
+            className={[
+              baseButton,
+              mobileButton,
+              desktopButton,
+              "md:mt-auto",
+              redHover,
+            ].join(" ")}
+          >
+            <LogOut className={iconSize} />
+            <span className="sr-only">Logout</span>
+          </button>
         </nav>
       </aside>
       {/* CONTENT*/}

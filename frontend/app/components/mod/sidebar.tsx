@@ -26,8 +26,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 	const blueHover = "text-white/80 hover:bg-blue-500/10 hover:text-blue-300 cursor-pointer";
 	const blueActive = "text-blue-200 bg-blue-500/15 shadow-lg shadow-blue-500/20";
 	const iconSize = "h-6 w-6 shrink-0";
-	const logoutButton = "hidden md:flex mt-auto";
-	const logoutBase = "flex h-12 w-12 items-center justify-center rounded-2xl transition duration-200";
+	const logoutBase = "flex items-center justify-center rounded-2xl transition duration-200";
 	const logoutHover = "text-white/80 hover:bg-blue-500/10 hover:text-red-300 cursor-pointer";
 
 	const icons = [
@@ -56,22 +55,29 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 									desktopButton,
 									isActive ? blueActive : blueHover,
 								].join(" ")}
-							>g
+							>
 								<Icon className={iconSize} />
 								<span className="sr-only">{title}</span>
 							</button>
 						);
 					})}
+					<button
+						type="button"
+						title="Logout"
+						onClick={handleLogout}
+						className={[
+							baseButton,
+							mobileButton,
+							desktopButton,
+							"md:mt-auto",
+							logoutBase,
+							logoutHover,
+						].join(" ")}
+					>
+						<LogOut className={iconSize} />
+						<span className="sr-only">Logout</span>
+					</button>
 				</nav>
-				<button
-					type="button"
-					title="Logout"
-					onClick={handleLogout}
-					className={[logoutButton, logoutBase, logoutHover].join(" ")}
-				>
-					<LogOut className={iconSize} />
-					<span className="sr-only">Logout</span>
-				</button>
 			</aside>
 			{children ? <main className={spaceLayout}>{children}</main> : null}
 		</div>
