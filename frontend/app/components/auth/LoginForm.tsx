@@ -12,7 +12,7 @@ export default function LoginForm() {
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null);
 
   const accountLinks = [
-    { label: "Forgot password?", action: () => router.push("#"), className: "text-white/80" },
+    { label: "Forgot password?", action: () => router.push("/forgotPassword"), className: "text-white/80" },
     { label: "Create new account", action: () => router.push("/register"), className: "font-semibold text-white" },
     { label: "Return to main page", action: () => router.push("/"), className: "text-white/80" },
   ];
