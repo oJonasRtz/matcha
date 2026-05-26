@@ -1,4 +1,5 @@
 import Sidebar from "../components/users/sidebar";
+import CheckLogin from "../lib/auth";
 import SwipeSession from "./swipe-session";
 
 export interface UserData {
@@ -180,7 +181,9 @@ const pagination: UserData[] = [
 	}
 ]
 
-export default function Swipe() {
+export default async function Swipe() {
+	await CheckLogin();
+
 	return (
 		<Sidebar>
 			<SwipeSession users={pagination} />

@@ -1,4 +1,6 @@
 import LoginForm from "../components/auth/LoginForm";
+import CheckLogin from "../lib/auth";
+import { redirect } from "next/navigation";
 
 // export default function Home() {
 //   return (
@@ -14,7 +16,12 @@ export const metadata = {
 	  title: "Login",
 }
 
-export default function Login() {
+export default async function Login() {
+	const isLoggedIn = await CheckLogin(0, false);
+	if (isLoggedIn)
+		redirect("/dashboard");
+
+
 	return (
 		<main className="flex min-h-screen items-center justify-center gap-4">
 			<LoginForm />

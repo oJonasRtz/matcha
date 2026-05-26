@@ -35,7 +35,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 		{ icon: FileText, title: "Reports", ref: "/mod/reports", handler: () => router.push("/mod/reports") },
 	];
 
-	const spaceLayout = "flex min-h-0 flex-1 pb-20 md:pb-0 md:pl-24";
+	const spaceLayout = "flex min-h-0 flex-1 items-center justify-center px-6 pb-20 md:px-10 md:pb-0 md:pl-24";
 
 	return (
 		<div className="relative flex min-h-screen w-full text-white">

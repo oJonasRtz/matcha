@@ -2,6 +2,7 @@ import Notifications from "../components/notifications/notifications"
 import NotificationsContainer from "../components/notifications/notificationsContainer";
 import Statistics from "../components/notifications/statistics";
 import Sidebar from "../components/users/sidebar"
+import CheckLogin from "../lib/auth";
 
 export const metadata = {
   title: "Notifications",
@@ -61,7 +62,9 @@ const notifications = [
 ]
 
 
-export default function NotificationsPage() {
+export default async function NotificationsPage() {
+	await CheckLogin();
+	
 	// ===== STYLES =====
 	const mainStyle = "flex min-h-screen items-stretch";
 

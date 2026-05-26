@@ -2,6 +2,7 @@ import Sidebar from "../components/users/sidebar";
 import HallOfFame from "../components/users/hallOfFame";
 import ProfileStatusCard from "../components/users/profileStatusCard";
 import SearchPreferencesCard from "../components/users/searchPreferencesCard";
+import CheckLogin from "../lib/auth";
 
 // export default function Home() {
 //   return (
@@ -28,7 +29,9 @@ export const metadata = {
   title: "Dashboard",
 }
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  await CheckLogin();
+
   // ===== STYLES =====
   const mainStyle = "flex min-h-screen items-stretch";
   const sectionStyle = "flex-1 flex flex-wrap gap-6 px-6 py-4";

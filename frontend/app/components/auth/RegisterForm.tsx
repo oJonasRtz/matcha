@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { FloatingLabelInput } from "../input/floatingLabel";
-import PasswordInput from "../input/password";
+import PasswordStrengthGroup, { type PasswordStrengthStatus } from "../input/passwordStrength";
 import RadioGroup from "../input/radioGroup";
 import { Card } from "../public/card";
 
@@ -34,25 +34,17 @@ export default function RegisterForm() {
 	});
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
+	const [passwordStatus, setPasswordStatus] = useState<PasswordStrengthStatus>({
+		isPasswordStrong: false,
+		passwordsMatch: false,
+		isValid: false,
+	});
 	const sexualOrientations = [
 		{ value: "heterosexual", label: "Heterosexual" },
 		{ value: "bisexual", label: "Bisexual" },
 		{ value: "homosexual", label: "Homosexual" },
 	];
 	const steps = ["Profile", "Security", "Details"];
-
-	// Password strength checker (same rules as backend)
-	function isStrongPassword(password: string) {
-		if (!password) return false;
-		const special = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/";
-		return (
-			password.length >= 8 &&
-			[...password].some((c) => c >= "A" && c <= "Z") &&
-			[...password].some((c) => c >= "a" && c <= "z") &&
-			[...password].some((c) => c >= "0" && c <= "9") &&
-			[...password].some((c) => special.includes(c))
-		);
-	}
 
 	const postFormLinks = [
 		{ label: "Login", action: () => router.push("/login"), className: "font-semibold text-white" },
@@ -94,15 +86,7 @@ export default function RegisterForm() {
 			body: JSON.stringify(payload),
 		})
 			.then(async (res) => {
-				// Read raw text first but never expose it to the user — only log for diagnostics
-				let text = "";
-				let responseData: any = {};
-				try {
-					text = await res.text();
-					responseData = text ? JSON.parse(text) : {};
-				} catch (parseErr) {
-					responseData = { raw: text };
-				}
+				await res.text();
 
 				if (res.ok) {
 					setSuccess("Registration successful!");
@@ -128,11 +112,11 @@ export default function RegisterForm() {
 
 		// If we're on the security step, enforce strong password before advancing
 		if (currentStep === 1) {
-			if (!isStrongPassword(formData.password)) {
+			if (!passwordStatus.isPasswordStrong) {
 				setError("Please choose a stronger password meeting all requirements.");
 				return;
 			}
-			if (formData.password !== formData.confirmPassword) {
+			if (!passwordStatus.passwordsMatch) {
 				setError("Passwords do not match!");
 				return;
 			}
@@ -163,9 +147,6 @@ export default function RegisterForm() {
 	const isFirstStep = currentStep === 0;
 	const isSecondStep = currentStep === 1;
 	const isThirdStep = currentStep === 2;
-
-	const isPasswordStrong = isStrongPassword(formData.password);
-	const passwordsMatch = formData.password === formData.confirmPassword;
 
 	return (
 		<Card className="max-w-md">
@@ -208,21 +189,13 @@ export default function RegisterForm() {
 
 					{isSecondStep ? (
 						<>
-							<PasswordInput id="password" name="password" label="Password" value={formData.password} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("password", event.target.value)} className="w-full rounded-xl text-gray" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" buttonFocusClassName="focus:ring-red-200/40" required />
-							<PasswordInput id="confirmPassword" name="confirmPassword" label="Confirm Password" value={formData.confirmPassword} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("confirmPassword", event.target.value)} className="w-full rounded-xl font-bold text-white" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" buttonFocusClassName="focus:ring-red-200/40" required />
-
-							{/* Password strength marker */}
-							<div className="mt-3 rounded-md bg-white/5 p-3 text-sm text-white/80">
-								<div className="font-semibold mb-2">Password requirements</div>
-								<ul className="grid grid-cols-1 gap-1">
-									<li className={`${formData.password.length >= 8 ? "text-green-400" : "text-white/60"}`}>{formData.password.length >= 8 ? "✔" : "○"} At least 8 characters</li>
-									<li className={`${/[A-Z]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[A-Z]/.test(formData.password) ? "✔" : "○"} One uppercase letter</li>
-									<li className={`${/[a-z]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[a-z]/.test(formData.password) ? "✔" : "○"} One lowercase letter</li>
-									<li className={`${/[0-9]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[0-9]/.test(formData.password) ? "✔" : "○"} One digit</li>
-											<li className={`${/[!@#$%^&*()\-_=+\[\]{}|;:'",.<>?\/]/.test(formData.password) ? "text-green-400" : "text-white/60"}`}>{/[!@#$%^&*()\-_=+\[\]{}|;:'",.<>?\/]/.test(formData.password) ? "✔" : "○"} One special character</li>
-											<li className={`${passwordsMatch ? "text-green-400" : "text-white/60"}`}>{passwordsMatch ? "✔" : "○"} Passwords match</li>
-								</ul>
-							</div>
+							<PasswordStrengthGroup
+								password={formData.password}
+								confirmPassword={formData.confirmPassword}
+								onPasswordChange={(event) => updateField("password", event.target.value)}
+								onConfirmPasswordChange={(event) => updateField("confirmPassword", event.target.value)}
+								onStatusChange={setPasswordStatus}
+							/>
 						</>
 					) : null}
 
@@ -282,9 +255,9 @@ export default function RegisterForm() {
 								type="button"
 								onClick={handleNextStep}
 								className={`w-full rounded-xl px-4 py-3 font-semibold text-white transition ${
-									currentStep === 1 && (!isPasswordStrong || !passwordsMatch) ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+									currentStep === 1 && !passwordStatus.isValid ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
 								}`}
-								disabled={currentStep === 1 && (!isPasswordStrong || !passwordsMatch)}
+								disabled={currentStep === 1 && !passwordStatus.isValid}
 							>
 								Next
 							</button>

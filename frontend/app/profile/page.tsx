@@ -2,6 +2,7 @@ import UserImages from "../components/profile/showImages";
 import UserInfo from "../components/profile/userInfo";
 import { Card } from "../components/public/card";
 import Sidebar from "../components/users/sidebar";
+import CheckLogin from "../lib/auth";
 import { UserData } from "../swipe/page";
 
 const userData: UserData = {
@@ -33,7 +34,9 @@ export const metadata = {
 	title: userData.name,
 }
 
-export default function Profile() {
+export default async function Profile() {
+	await CheckLogin();
+	
 	const mainStyle = "mx-auto min-h-screen p-4 md:p-8";
 	const cardStyle = "p-4 md:p-6 max-w-6xl mx-auto";
 
