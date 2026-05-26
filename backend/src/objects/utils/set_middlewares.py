@@ -81,6 +81,18 @@ def set_middlewares(app, pub_routes):
                 "required_fields": ["username", "password", "email", "firstname", "lastname", "gender"],
                 "optional_fields": {"sexual_orientation": "bisexual"}
             },
+            "/mod/login": {
+                "required_fields": ["password"],
+                "optional_fields": {
+                    "username": None,
+                    "email": None,
+                }
+            },
+             "/mod/logout": None,  # No validation needed for logout since it just checks the token
+             "/mod/register": {
+                "required_fields": ["username", "password", "email"],
+                "optional_fields": {}
+            },
         }
         
         route = request.path

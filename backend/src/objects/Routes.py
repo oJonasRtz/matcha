@@ -5,6 +5,7 @@ from src.endpoints.controlers.Profiles import ProfileController
 from src.endpoints.controlers.Photos import PhotosController
 from src.endpoints.controlers.Matches import MatchesController
 from src.endpoints.controlers.Chat import ChatController
+from src.endpoints.controlers.Mods import ModsController
 
 class Routes:
     def __init__(self):
@@ -16,7 +17,8 @@ class Routes:
             ProfileController,
             PhotosController,
             MatchesController,
-            ChatController
+            ChatController,
+            ModsController
         ]
         
         for controler in self.controlers:

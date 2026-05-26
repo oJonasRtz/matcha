@@ -2,7 +2,7 @@ import jwt
 import os
 import datetime
 
-def generate_jwt(public_id: str):
+def generate_jwt(public_id: str, role: str | None = None):
 	JWT_SECRET = os.getenv("JWT_SECRET")
 	JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 	JWT_EXP_DELTA_HOURS = int(os.getenv("JWT_EXP_HOURS", "1"))
@@ -11,5 +11,7 @@ def generate_jwt(public_id: str):
 		"public_id": public_id,
 		"exp": datetime.datetime.utcnow() + datetime.timedelta(hours=JWT_EXP_DELTA_HOURS)
 	}
+	if role is not None:
+		payload["role"] = role
 	secret = str(JWT_SECRET)
 	return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)

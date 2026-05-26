@@ -9,14 +9,14 @@ class SessionController:
 	@classmethod
 	def get_public_routes(cls):
 		return [
-			("/sessions/login", cls._login, ["POST"], "login")
+			("/sessions/login", cls._login, ["POST"], "session_login")
 		]
 
 	@classmethod
 	def get_private_routes(cls):
 		return [
-			("/sessions/logout", cls._logout, ["POST"], "logout"),
-			("/sessions/check", cls._check_user, ["GET"], "check_user")
+			("/sessions/logout", cls._logout, ["POST"], "session_logout"),
+			("/sessions/check", cls._check_user, ["GET"], "session_check_user")
 		]
 	
 	@staticmethod
@@ -76,8 +76,8 @@ class SessionController:
 				"message": "Login successful.",
 				"token": token
 			}), 200
-		except Exception as e:
-			return jsonify({"error": f"Login failed. {str(e)}"}), 400
+		except Exception :
+			return jsonify({"error": f"Login failed."}), 400
 
 	# @staticmethod
 	# def login_validator(req):

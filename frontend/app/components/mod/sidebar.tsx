@@ -9,7 +9,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 	const pathname = usePathname();
 
 	function handleLogout() {
-		fetch("/api/logout", {
+		fetch("/api/mlogout", {
 			method: "POST",
 		});
 		router.push("/mod/login");
