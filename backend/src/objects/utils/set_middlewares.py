@@ -9,58 +9,70 @@ from src.endpoints.controlers.Session import SessionController
 def set_middlewares(app, pub_routes):
     if not app or not isinstance(app, Flask) or not isinstance(pub_routes, list):
         raise ValueError("Expected a Flask app instance")
-    
-    
+
     JWT_SECRET = os.getenv("JWT_SECRET")
     JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
     if not JWT_SECRET or JWT_SECRET == "":
         raise RuntimeError("JWT_SECRET not set in environment variables")
-    
+
     @app.before_request
     def global_middleware():
         path = request.path
-        
+
         # -- Public routes --
         if any(path.startswith(route) for route, _, _, _ in pub_routes):
             g.user = None
             return
-        
+
         # -- Private Routes --
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
             return jsonify({"error": "Unauthorized"}), 401
-        
+
         parts = auth_header.split()
         if len(parts) != 2:
             return jsonify({"error": "Unauthorized"}), 401
 
         token = parts[1]
-        
+
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
             g.user = {
                 "public_id": payload.get("public_id"),
+                "role": payload.get("role", "user"),
             }
         except jwt.ExpiredSignatureError:
-            logout.logout()  # Invalidate the token in the database
+            try:
+                payload = jwt.decode(
+                    token,
+                    JWT_SECRET,
+                    algorithms=[JWT_ALGORITHM],
+                    options={"verify_exp": False},
+                )
+            except jwt.InvalidTokenError:
+                return jsonify({"error": "Token expired"}), 401
+
+            logout.logout(
+                role=payload.get("role", "user"),
+                public_id=payload.get("public_id"),
+            )
             return jsonify({"error": "Token expired"}), 401
         except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token"}), 401
-        
+
     def validatorHelper(body: dict):
         if body is None:
             return None, None
-        
+
         data, error = get_body(
             required_fields=body.get("required_fields", []),
             optional_fields=body.get("optional_fields", {})
         )
         if error:
             return None, error
-        
+
         return data, None
-        
-    
+
     @app.before_request
     def validator():
         # <route, method>: validator_function
@@ -88,25 +100,25 @@ def set_middlewares(app, pub_routes):
                     "email": None,
                 }
             },
-             "/mod/logout": None,  # No validation needed for logout since it just checks the token
-             "/mod/register": {
+            "/mod/logout": None,  # No validation needed for logout since it just checks the token
+            "/mod/register": {
                 "required_fields": ["username", "password", "email"],
                 "optional_fields": {}
             },
         }
-        
+
         route = request.path
-        if route not in val:        
-            return jsonify({"error": "Validator not found"}), 500    
-        
+        if route not in val:
+            return jsonify({"error": "Validator not found"}), 500
+
         validate = val[route]
         if validate is None:
             return None
-        
+
         data, error = validatorHelper(validate)
         if error:
             return jsonify({"error": error}), 400
-        
+
         g.body = data
-        
+
         return None

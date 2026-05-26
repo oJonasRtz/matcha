@@ -95,4 +95,4 @@ class SessionController:
 
 	@staticmethod
 	def _logout():
-		return logout()
+		return logout(role="user", public_id=g.user.get("public_id"))

@@ -21,7 +21,6 @@ export async function POST() {
 
 	cookieStore.delete("token");
 
-
 	if (!res.ok) {
 		const data = await res.json();
 		return new Response(JSON.stringify(data), {

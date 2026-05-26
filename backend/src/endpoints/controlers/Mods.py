@@ -2,6 +2,8 @@ from flask import jsonify, g
 from src.objects.Database import Database
 import bcrypt
 from src.endpoints.utils.generate_jwt import generate_jwt
+from src.endpoints.utils.check_strong_password import is_strong_password
+from src.endpoints.utils.logout import logout
 
 class ModsController:
     @classmethod
@@ -68,21 +70,44 @@ class ModsController:
     
     @staticmethod
     def _logout():
-        try:
-            id = g.user.get("public_id")
-            Database.run_query(
-                """
-                UPDATE moderators
-                SET is_online = FALSE, last_online = NOW()
-                WHERE public_id = %s
-                """,
-                (id,)
-            )
-  
-            return jsonify({"message": "Logged out successfully"}), 200
-        except:
-            return jsonify({"error": "Invalid token"}), 401
+        return logout(role="mod", public_id=g.user.get("public_id"))
 
     @staticmethod
     def _register():
-        return jsonify({"message": "ok"}), 200
+        data = g.body
+
+        password = data["password"]
+        if not is_strong_password(password):
+            return jsonify({"error": "Weak password."}), 400
+        hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            ).decode('utf-8')
+        
+        try:
+            mod = Database.run_query(
+                """
+                INSERT INTO moderators (
+                    username,
+                    email,
+                    password_hash,
+                )
+                VALUES (%s, %s, %s)
+                RETURNING public_id
+                """,
+                (
+                    data["username"],
+                    data["email"],
+                    hashed_password
+                ),
+                fetch_one=True
+            )
+            public_id = mod[0]
+            token = generate_jwt(public_id, role="mod")
+            return jsonify({
+                "message": "Moderator registered successfully.",
+                "token": token
+            }), 201
+        except Exception as e:
+            return jsonify({"error": f"Registration failed."}), 400
+        

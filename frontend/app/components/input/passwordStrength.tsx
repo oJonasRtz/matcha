@@ -19,6 +19,9 @@ type PasswordStrengthProps = {
 	title?: string;
 	className?: string;
 	onStatusChange?: (status: PasswordStrengthStatus) => void;
+    focusClassName?: string;
+    labelFocusClassName?: string;
+    buttonFocusClassName?: string;
 };
 
 export function isStrongPassword(password: string) {
@@ -45,6 +48,9 @@ export default function PasswordStrengthGroup({
 	title = "Password requirements",
 	className = "",
 	onStatusChange,
+    focusClassName = "focus:border-red-400 focus:ring-2 focus:ring-red-200/40",
+    labelFocusClassName = "peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300",
+    buttonFocusClassName = "focus:ring-red-200/40",
 }: PasswordStrengthProps) {
 	const isPasswordStrong = isStrongPassword(password);
 	const passwordsMatch = password === confirmPassword;
@@ -63,9 +69,9 @@ export default function PasswordStrengthGroup({
 				value={password}
 				onChange={onPasswordChange}
 				className="w-full rounded-xl font-bold text-white"
-				focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40"
-				labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300"
-				buttonFocusClassName="focus:ring-red-200/40"
+				focusClassName={focusClassName}
+				labelFocusClassName={labelFocusClassName}
+				buttonFocusClassName={buttonFocusClassName}
 				required
 			/>
 
@@ -76,9 +82,9 @@ export default function PasswordStrengthGroup({
 				value={confirmPassword}
 				onChange={onConfirmPasswordChange}
 				className="w-full rounded-xl font-bold text-white"
-				focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40"
-				labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300"
-				buttonFocusClassName="focus:ring-red-200/40"
+				focusClassName={focusClassName}
+				labelFocusClassName={labelFocusClassName}
+				buttonFocusClassName={buttonFocusClassName}
 				required
 			/>
 

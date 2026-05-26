@@ -63,9 +63,11 @@ class UserController:
 						firstname,
 						lastname,
 						gender,
-						sexual_orientation
+						sexual_orientation,
+						is_online,
+						last_online
 					)
-					VALUES (%s, %s, %s, %s, %s, %s)
+					VALUES (%s, %s, %s, %s, %s, %s, TRUE, NOW())
 					RETURNING id, public_id
 				)
 				INSERT INTO auth (user_id, password_hash)

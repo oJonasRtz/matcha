@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { FloatingLabelInput } from "../input/floatingLabel";
 import PasswordStrengthGroup, { type PasswordStrengthStatus } from "../input/passwordStrength";
 import { Card } from "../public/card";
@@ -15,6 +16,7 @@ type ModRegisterFormData = {
 };
 
 export default function ModRegisterForm() {
+	const router = useRouter();
 	const formRef = useRef<HTMLFormElement>(null);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [formData, setFormData] = useState<ModRegisterFormData>({
@@ -24,6 +26,7 @@ export default function ModRegisterForm() {
 		confirmPassword: "",
 	});
 	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
 	const [passwordStatus, setPasswordStatus] = useState<PasswordStrengthStatus>({
 		isPasswordStrong: false,
 		passwordsMatch: false,
@@ -36,7 +39,49 @@ export default function ModRegisterForm() {
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		alert("Test only: registration submitted.");
+		setError(null);
+		setSuccess(null);
+
+		const payload = {
+			username: formData.username.trim(),
+			email: formData.email.trim(),
+			password: formData.password,
+		};
+
+		fetch("/api/mregister", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		})
+			.then(async (res) => {
+				const text = await res.text();
+				let responseData: any = {};
+
+				try {
+					responseData = text ? JSON.parse(text) : {};
+				} catch {
+					responseData = { raw: text };
+				}
+
+				return { res, responseData };
+			})
+			.then(({ res, responseData }) => {
+				if (res.ok) {
+					setSuccess(responseData?.message || "Moderator registered successfully.");
+					setError(null);
+					setTimeout(() => router.push("/mod/dashboard"), 500);
+					return;
+				}
+
+				setError(responseData?.error || "Registration failed. Please check your details and try again.");
+				setSuccess(null);
+			})
+			.catch(() => {
+				setError("Registration failed. Please try again later.");
+				setSuccess(null);
+			});
 	}
 
 	function updateField(field: keyof ModRegisterFormData, value: string) {
@@ -89,6 +134,12 @@ export default function ModRegisterForm() {
 					</div>
 				) : null}
 
+				{success ? (
+					<div className="mb-4 rounded-md border border-green-500 bg-green-500/20 px-4 py-2 text-sm text-green-100">
+						{success}
+					</div>
+				) : null}
+
 				<div className="mb-6 flex items-center justify-center gap-2 text-xs font-semibold text-white/60">
 					{steps.map((step, index) => (
 						<div
@@ -135,6 +186,9 @@ export default function ModRegisterForm() {
 							onConfirmPasswordChange={(event) => updateField("confirmPassword", event.target.value)}
 							onStatusChange={setPasswordStatus}
 							title="Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters."
+							focusClassName="focus:border-blue-400 focus:ring-2 focus:ring-blue-200/40"
+							labelFocusClassName="peer-focus:text-blue-300 peer-not-placeholder-shown:text-blue-300"
+							buttonFocusClassName="focus:ring-blue-200/40"
 						/>
 					) : null}
 
