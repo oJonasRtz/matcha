@@ -1,50 +1,31 @@
 #!/bin/bash
 set -e
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CERT="server/certificates/server.cert"
 KEY="server/certificates/server.key"
 
-needs_regen=true
-
-if [[ -f "$CERT" && -f "$KEY" ]]; then
-    if openssl x509 -in "$CERT" -noout -ext subjectAltName 2>/dev/null | grep -q "DNS:localhost"; then
-        needs_regen=false
-    fi
+# Install mkcert if not present
+if ! command -v mkcert &> /dev/null; then
+    echo "mkcert not found, installing..."
+    curl -L -o /usr/local/bin/mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+    chmod +x /usr/local/bin/mkcert
+else
+    echo "mkcert is already installed."
 fi
 
-if [[ "$needs_regen" == false ]]; then
-    echo "Certificate and key already exist with SAN localhost. Skipping generation."
-    exit 0
-fi
+# Install the local CA if not already installed
+mkcert -install
 
-mkdir -p server/certificates
+# Gen certificates for localhost
+mkcert -key-file "$KEY" -cert-file "$CERT" localhost 127.0.0.1 ::1
 
-cat > /tmp/local-ssl.cnf <<'EOF'
-[req]
-default_bits = 4096
-prompt = no
-default_md = sha256
-req_extensions = req_ext
-distinguished_name = dn
+# change ownership to current user
+sudo chown -R $(id -un):$(id -gn) server/certificates
 
-[dn]
-CN = localhost
-
-[req_ext]
-subjectAltName = @alt_names
-
-[alt_names]
-DNS.1 = localhost
-DNS.2 = host.docker.internal
-IP.1 = 127.0.0.1
-IP.2 = ::1
-EOF
-
-# generate self-signed certificate and key
-openssl req -x509 -newkey rsa:4096 -keyout "$KEY" -out "$CERT" -days 365 -nodes -config /tmp/local-ssl.cnf -extensions req_ext
-
-rm -f /tmp/local-ssl.cnf
+# define permissions 
+chmod 700 server/certificates
+chmod 600 server/certificates/server.key
+chmod 644 server/certificates/server.cert
 
 
 echo "✅ Certificate generated:"

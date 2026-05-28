@@ -7,10 +7,6 @@ export const metadata = {
 
 export default async function ModSettingsPage() {
 	await CheckLogin(1);
-	
-	return (
-		<main className="flex min-h-screen items-center justify-center text-white">
-			<ModSettingsComponent />
-		</main>	
-	);
+
+	return <ModSettingsComponent />;
 }

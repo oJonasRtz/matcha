@@ -14,3 +14,9 @@ CREATE TABLE IF NOT EXISTS moderators (
 INSERT INTO moderators (username, email, password_hash)
 VALUES ('admin', 'admin@mod.com', crypt('admin', gen_salt('bf')))
 ON CONFLICT (username) DO NOTHING;
+
+ALTER TABLE users
+ADD CONSTRAINT fk_users_moderator_who_restricted
+FOREIGN KEY (moderator_who_restricted)
+REFERENCES moderators(id)
+ON DELETE SET NULL;

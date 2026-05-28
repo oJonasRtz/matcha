@@ -17,7 +17,5 @@ CREATE TABLE IF NOT EXISTS users (
 	restricted BOOLEAN NOT NULL DEFAULT FALSE,
 	restriction_reason TEXT,
 	restriction_expires TIMESTAMPTZ,
-	moderator_who_restricted INTEGER,
-
-	FOREIGN KEY (moderator_who_restricted) REFERENCES moderators(id) ON DELETE SET NULL
+	moderator_who_restricted INTEGER
 );

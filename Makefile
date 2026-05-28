@@ -53,8 +53,13 @@ check-env:
 	fi
 
 tls:
-	@echo "${GREEN}===== Generating TLS certificates... =====${RESET}"
-	@bash ./scripts/generate_ssl_certs.sh
+	@if [ -f "./server/certificates/server.crt" ] && [ -f "./server/certificates/server.key" ]; then \
+		echo "${GREEN}===== TLS certificates already exist. Skipping generation. =====${RESET}"; \
+	else \
+		echo "${GREEN}===== Generating TLS certificates... =====${RESET}"; \
+		chmod +x ./scripts/generate_ssl_certs.sh; \
+		bash ./scripts/generate_ssl_certs.sh; \
+	fi
 
 re: down up
 
