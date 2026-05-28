@@ -1,7 +1,7 @@
 "use client";
 
-import { Ban, Clock3, RotateCcw, Search as SearchIcon, ShieldBan, ShieldX, UserRound, X } from "lucide-react";
-import { type ReactNode, useMemo, useState } from "react";
+import { Ban, Clock3, MessageSquareMore, RotateCcw, Search as SearchIcon, ShieldBan, ShieldX, UserRound, X } from "lucide-react";
+import { type ReactNode, useMemo, useState, useEffect } from "react";
 import SearchInput from "../input/search";
 import { Card } from "../public/card";
 import ModSidebar from "./sidebar";
@@ -12,15 +12,25 @@ type ModUser = {
 	avatarUrl: string;
 };
 
+type ChatSpeaker = "reporter" | "reported";
+
+type ChatMessage = {
+	speaker: ChatSpeaker;
+	timestamp: string;
+	text: string;
+};
+
 type RestrictionType = "timeout" | "temp-ban" | "perma-ban";
 
 type PendingReport = {
 	id: number;
 	reason: string;
 	details: string;
+	chatLog: ChatMessage[];
 	reportedAt: string;
 	reporter: ModUser;
 	reported: ModUser;
+	moderatorNote?: string;
 };
 
 type HandledReport = PendingReport & {
@@ -83,6 +93,23 @@ const pendingSeed: PendingReport[] = [
 			username: "vic.azevedo",
 			avatarUrl: makeAvatar("Victor Azevedo", "#1d4ed8", "#0f172a"),
 		},
+		chatLog: [
+			{
+				speaker: "reporter",
+				timestamp: "10:07",
+				text: "I asked you to stop sending these messages yesterday. This is harassment.",
+			},
+			{
+				speaker: "reported",
+				timestamp: "10:08",
+				text: "Relax. I only wanted to keep talking. You're overreacting.",
+			},
+			{
+				speaker: "reporter",
+				timestamp: "10:09",
+				text: "You were blocked twice and still created another account to continue.",
+			},
+		],
 	},
 	{
 		id: 2,
@@ -99,6 +126,23 @@ const pendingSeed: PendingReport[] = [
 			username: "clara.r",
 			avatarUrl: makeAvatar("Clara Ribeiro", "#334155", "#3b82f6"),
 		},
+		chatLog: [
+			{
+				speaker: "reported",
+				timestamp: "09:31",
+				text: "Everyone here is clueless. That's why I called them out.",
+			},
+			{
+				speaker: "reporter",
+				timestamp: "09:32",
+				text: "You kept targeting users with insults after they asked you to stop.",
+			},
+			{
+				speaker: "reported",
+				timestamp: "09:33",
+				text: "I said what I said. They should toughen up.",
+			},
+		],
 	},
 	{
 		id: 3,
@@ -115,6 +159,23 @@ const pendingSeed: PendingReport[] = [
 			username: "paulo.m",
 			avatarUrl: makeAvatar("Paulo Mendes", "#1e293b", "#64748b"),
 		},
+		chatLog: [
+			{
+				speaker: "reporter",
+				timestamp: "23:01",
+				text: "Why are you asking for payment outside the app before we even met?",
+			},
+			{
+				speaker: "reported",
+				timestamp: "23:02",
+				text: "It's just a verification fee. Transfer it and I'll send the private link.",
+			},
+			{
+				speaker: "reporter",
+				timestamp: "23:03",
+				text: "That link is suspicious and I'm reporting this conversation.",
+			},
+		],
 	},
 ];
 
@@ -251,6 +312,9 @@ function ReportCard({
 						) : null}
 					</div>
 					<p className="mt-3 line-clamp-3 text-sm leading-6 text-white/78">{item.reason}</p>
+					{showRestriction && handledItem.moderatorNote ? (
+						<p className="mt-2 text-xs italic text-white/60">Note: {handledItem.moderatorNote}</p>
+					) : null}
 					<div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-white/45">
 						<span>{item.reportedAt}</span>
 						{showRestriction ? <span>•</span> : null}
@@ -273,6 +337,7 @@ export default function ModReportsComponent() {
 	const [pendingReports, setPendingReports] = useState<PendingReport[]>(pendingSeed);
 	const [handledReports, setHandledReports] = useState<HandledReport[]>(handledSeed);
 	const [selectedReportId, setSelectedReportId] = useState<number | null>(pendingSeed[0]?.id ?? null);
+	const [centerQuery, setCenterQuery] = useState("");
 	const [pendingQuery, setPendingQuery] = useState("");
 	const [handledQuery, setHandledQuery] = useState("");
 	const [modalRestrictionType, setModalRestrictionType] = useState<RestrictionType | null>(null);
@@ -280,7 +345,33 @@ export default function ModReportsComponent() {
 	const [manualAmount, setManualAmount] = useState<number>(1);
 	const [manualUnit, setManualUnit] = useState<RestrictionDurationUnit>("hours");
 
-	const selectedReport = pendingReports.find((item: PendingReport) => item.id === selectedReportId) ?? null;
+	const searchedReport = useMemo(() => {
+		const q = centerQuery.trim();
+		if (!q) return null;
+		const lq = q.toLowerCase();
+
+		const found = [...pendingReports, ...handledReports].find((item: PendingReport) =>
+			[item.reported.name, item.reported.username, item.reporter.name, item.reporter.username]
+				.join(" ")
+				.toLowerCase()
+				.includes(lq),
+		);
+
+		if (found) return found;
+
+		// create a temporary pending report when no exact match is found
+		return {
+			id: -1,
+			reason: `Manual restriction for ${q}`,
+			details: `Manual restriction target: ${q}`,
+			chatLog: [],
+			reportedAt: new Date().toLocaleString(),
+			reporter: currentModerator,
+			reported: { name: q, username: q, avatarUrl: makeAvatar(q, "#334155", "#64748b") },
+		} as PendingReport;
+	}, [centerQuery, pendingReports, handledReports]);
+
+	const selectedReport = searchedReport ?? pendingReports.find((item: PendingReport) => item.id === selectedReportId) ?? null;
 
 	const filteredPendingReports = useMemo(
 		() =>
@@ -421,6 +512,30 @@ export default function ModReportsComponent() {
 
 	const durationChoice = resolveDurationChoice();
 
+	const [moderatorNote, setModeratorNote] = useState("");
+
+	useEffect(() => {
+		setModeratorNote(selectedReport?.moderatorNote ?? "");
+	}, [selectedReport]);
+
+	function saveModeratorNote() {
+		if (!selectedReport) return;
+
+		// If the selected report exists in handledReports, update it there
+		if (handledReports.find((r) => r.id === selectedReport.id)) {
+			setHandledReports((current) => current.map((r) => (r.id === selectedReport.id ? { ...r, moderatorNote } : r)));
+			return;
+		}
+
+		// Otherwise update pendingReports if present
+		if (pendingReports.find((r) => r.id === selectedReport.id)) {
+			setPendingReports((current) => current.map((r) => (r.id === selectedReport.id ? { ...r, moderatorNote } : r)));
+			return;
+		}
+
+		// For temporary searched items (id === -1) we just update local state; nothing persisted.
+	}
+
 	return (
 		<ModSidebar>
 			<div className="w-full max-w-[1600px] py-8">
@@ -495,6 +610,16 @@ export default function ModReportsComponent() {
 							<span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-100">{pendingReports.length} pending</span>
 						</div>
 
+							<SearchInput
+								label="Search any user"
+								value={centerQuery}
+								onChange={(event) => setCenterQuery(event.target.value)}
+								containerClassName="w-full mb-3"
+								className="text-white"
+								focusClassName="focus:border-blue-400 focus:ring-2 focus:ring-blue-200/40"
+								labelFocusClassName="peer-focus:text-blue-300 peer-not-placeholder-shown:text-blue-300"
+							/>
+
 						{selectedReport ? (
 							<div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/35 p-5">
 								<div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -514,7 +639,7 @@ export default function ModReportsComponent() {
 
 								<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 									<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Reporter</p>
+										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Who reported</p>
 										<div className="mt-3 flex items-center gap-3">
 											<Avatar user={selectedReport.reporter} />
 											<div>
@@ -525,24 +650,79 @@ export default function ModReportsComponent() {
 									</div>
 
 									<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Reason (reports.reason)</p>
-										<p className="mt-3 text-sm leading-6 text-white/80">{selectedReport.reason}</p>
+										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Reported user</p>
+										<div className="mt-3 flex items-center gap-3">
+											<Avatar user={selectedReport.reported} />
+											<div>
+												<p className="font-semibold text-white">{selectedReport.reported.name}</p>
+												<p className="text-sm text-white/55">@{selectedReport.reported.username}</p>
+											</div>
+										</div>
 									</div>
 
 									<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Details (reports.details)</p>
-										<p className="mt-3 text-sm leading-6 text-white/80">{selectedReport.details}</p>
+										<p className="text-xs uppercase tracking-[0.18em] text-white/45">Reason (reports.reason)</p>
+										<p className="mt-3 text-sm leading-6 text-white/80">{selectedReport.reason}</p>
 									</div>
 								</div>
 
 								<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+									<p className="text-xs uppercase tracking-[0.18em] text-white/45">Details (reports.details)</p>
+									<p className="mt-3 text-sm leading-6 text-white/80">{selectedReport.details}</p>
+								</div>
+
+								<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
 									<div className="flex items-center gap-2 text-sm font-semibold text-white">
-										<SearchIcon className="h-4 w-4 text-blue-200" />
-										Database alignment
+										<MessageSquareMore className="h-4 w-4 text-blue-200" />
+										Chat log as proof
 									</div>
 									<p className="mt-2 text-sm leading-6 text-white/60">
-										Restriction decisions are modeled with users.restricted, users.restriction_reason, users.restriction_expires and users.moderator_who_restricted, while report content uses reports.reason and reports.details.
+										Fictitious conversation snapshot between the reporter and the reported user for moderation review.
 									</p>
+									<div className="mt-4 space-y-3">
+										{selectedReport.chatLog.map((message, index) => {
+											const fromReporter = message.speaker === "reporter";
+											const speaker = fromReporter ? selectedReport.reporter : selectedReport.reported;
+
+											return (
+												<div key={`${message.timestamp}-${index}`} className={`flex ${fromReporter ? "justify-start" : "justify-end"}`}>
+													<div className={`max-w-[82%] rounded-2xl border px-4 py-3 ${fromReporter ? "border-blue-400/20 bg-blue-500/10" : "border-white/10 bg-white/5"}`}>
+														<div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+															<span>{fromReporter ? "Reporter" : "Reported"}</span>
+															<span>•</span>
+															<span>@{speaker.username}</span>
+															<span>•</span>
+															<span>{message.timestamp}</span>
+														</div>
+														<p className="mt-2 text-sm leading-6 text-white/85">{message.text}</p>
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</div>
+
+								<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+									<div className="flex items-start gap-2">
+										<div className="flex-1">
+											<p className="text-xs uppercase tracking-[0.18em] text-white/45">Moderator note</p>
+											<textarea
+												value={moderatorNote}
+												onChange={(e) => setModeratorNote(e.target.value)}
+												rows={4}
+												className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-blue-400/40 focus:ring-2 focus:ring-blue-200/20"
+											/>
+										</div>
+										<div className="ml-4 flex flex-col items-end">
+											<button
+												type="button"
+												onClick={() => saveModeratorNote()}
+												className="rounded-xl border border-white/10 bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+											>
+												Save note
+											</button>
+										</div>
+									</div>
 								</div>
 
 								<div className="mt-auto">

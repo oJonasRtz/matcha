@@ -35,6 +35,7 @@ fclean:
 
 	@echo "${RED}===== Erasing everything... =====${RESET}"
 	@rm -f ./server/certificates/*.crt
+	@rm -f ./server/certificates/*.cert
 	@rm -f ./server/certificates/*.key
 	@rm -f backend/.env
 	@rm -f frontend/.env
@@ -53,11 +54,10 @@ check-env:
 	fi
 
 tls:
-	@if [ -f "./server/certificates/server.crt" ] && [ -f "./server/certificates/server.key" ]; then \
+	if [ -f "./server/certificates/server.cert" ] && [ -f "./server/certificates/server.key" ]; then \
 		echo "${GREEN}===== TLS certificates already exist. Skipping generation. =====${RESET}"; \
 	else \
 		echo "${GREEN}===== Generating TLS certificates... =====${RESET}"; \
-		chmod +x ./scripts/generate_ssl_certs.sh; \
 		bash ./scripts/generate_ssl_certs.sh; \
 	fi
 

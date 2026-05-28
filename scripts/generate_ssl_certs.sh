@@ -19,9 +19,6 @@ mkcert -install
 # Gen certificates for localhost
 mkcert -key-file "$KEY" -cert-file "$CERT" localhost 127.0.0.1 ::1
 
-# change ownership to current user
-sudo chown -R $(id -un):$(id -gn) server/certificates
-
 # define permissions 
 chmod 700 server/certificates
 chmod 600 server/certificates/server.key

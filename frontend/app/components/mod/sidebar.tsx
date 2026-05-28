@@ -31,7 +31,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 
 	const icons = [
 		{ icon: Home, title: "Home", ref: "/mod/dashboard", handler: () => router.push("/mod/dashboard") },
-		{ icon: UserPlus, title: "Register", ref: "/mod/register", handler: () => router.push("/mod/register") },
+		{ icon: UserPlus, title: "Users", ref: "/mod/users", handler: () => router.push("/mod/users") },
 		{ icon: FileText, title: "Reports", ref: "/mod/reports", handler: () => router.push("/mod/reports") },
 		{ icon: Settings, title: "Settings", ref: "/mod/settings", handler: () => router.push("/mod/settings") },
 	];

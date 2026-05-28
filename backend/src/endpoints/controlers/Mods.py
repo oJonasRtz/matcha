@@ -91,19 +91,21 @@ class ModsController:
                     username,
                     email,
                     password_hash,
+                    role
                 )
-                VALUES (%s, %s, %s)
+                VALUES (%s, %s, %s, %s)
                 RETURNING public_id
                 """,
                 (
                     data["username"],
                     data["email"],
-                    hashed_password
+                    hashed_password,
+                    data.get("role", "mod")
                 ),
                 fetch_one=True
             )
             public_id = mod[0]
-            token = generate_jwt(public_id, role="mod")
+            token = generate_jwt(public_id, role=data.get("role", "mod"))
             return jsonify({
                 "message": "Moderator registered successfully.",
                 "token": token

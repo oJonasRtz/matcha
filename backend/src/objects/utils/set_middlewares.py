@@ -102,7 +102,7 @@ def set_middlewares(app, pub_routes):
             },
             "/mod/logout": None,  # No validation needed for logout since it just checks the token
             "/mod/register": {
-                "required_fields": ["username", "password", "email"],
+                "required_fields": ["username", "password", "email", "role"],
                 "optional_fields": {}
             },
         }

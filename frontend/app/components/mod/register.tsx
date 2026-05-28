@@ -2,26 +2,25 @@
 
 import { useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { FloatingLabelInput } from "../input/floatingLabel";
 import PasswordStrengthGroup, { type PasswordStrengthStatus } from "../input/passwordStrength";
 import { Card } from "../public/card";
-import ModSidebar from "./sidebar";
 
 type ModRegisterFormData = {
 	username: string;
 	email: string;
+	role: string;
 	password: string;
 	confirmPassword: string;
 };
 
 export default function ModRegisterForm() {
-	const router = useRouter();
 	const formRef = useRef<HTMLFormElement>(null);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [formData, setFormData] = useState<ModRegisterFormData>({
 		username: "",
 		email: "",
+		role: "",
 		password: "",
 		confirmPassword: "",
 	});
@@ -45,6 +44,7 @@ export default function ModRegisterForm() {
 		const payload = {
 			username: formData.username.trim(),
 			email: formData.email.trim(),
+			role: formData.role.trim(),
 			password: formData.password,
 		};
 
@@ -71,7 +71,6 @@ export default function ModRegisterForm() {
 				if (res.ok) {
 					setSuccess(responseData?.message || "Moderator registered successfully.");
 					setError(null);
-					setTimeout(() => router.push("/mod/dashboard"), 500);
 					return;
 				}
 
@@ -124,7 +123,6 @@ export default function ModRegisterForm() {
 	}
 
 	return (
-		<ModSidebar>
 			<Card className="max-w-md text-white">
 				<h1 className="mb-4 text-2xl font-bold">Moderator Registration</h1>
 
@@ -175,6 +173,17 @@ export default function ModRegisterForm() {
 								className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 								required
 							/>
+
+							<FloatingLabelInput
+								type="text"
+								name="role"
+								id="role"
+								label="Role"
+								value={formData.role}
+								onChange={(event: ChangeEvent<HTMLInputElement>) => updateField("role", event.target.value)}
+								className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+								required
+							/>
 						</>
 					) : null}
 
@@ -215,6 +224,5 @@ export default function ModRegisterForm() {
 					</div>
 				</form>
 			</Card>
-		</ModSidebar>
-	)
+		);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, BarChart3, CircleDollarSign, Heart, LogIn, Users, VenetianMask } from "lucide-react";
+import { Activity, BarChart3, CircleDollarSign, Globe2, Heart, LogIn, Users, VenetianMask } from "lucide-react";
 import { useMemo } from "react";
 import ModSidebar from "./sidebar";
 
@@ -23,6 +23,12 @@ type WeeklyLoginPoint = {
 	count: number;
 };
 
+type CountrySlice = {
+	label: string;
+	count: number;
+	color: string;
+};
+
 const monitoringTemplate = {
 	onlineUsers: 184,
 	totalUsers: 1248,
@@ -31,7 +37,7 @@ const monitoringTemplate = {
 	gender: [
 		{ label: "Men", value: 54, count: 673, color: "#60a5fa" },
 		{ label: "Women", value: 43, count: 536, color: "#f472b6" },
-		{ label: "Non-binary", value: 3, count: 39, color: "#c084fc" },
+		{ label: "Other", value: 3, count: 39, color: "#c084fc" },
 	] satisfies GenderSlice[],
 	orientation: [
 		{ label: "Heterosexual", value: 48, count: 599, color: "#22c55e" },
@@ -48,6 +54,13 @@ const monitoringTemplate = {
 		{ day: "Sat", count: 188 },
 		{ day: "Sun", count: 153 },
 	] satisfies WeeklyLoginPoint[],
+	countries: [
+		{ label: "Brazil", count: 426, color: "#60a5fa" },
+		{ label: "United States", count: 238, color: "#22c55e" },
+		{ label: "Spain", count: 164, color: "#f59e0b" },
+		{ label: "Mexico", count: 121, color: "#f472b6" },
+		{ label: "Argentina", count: 93, color: "#a78bfa" },
+	] satisfies CountrySlice[],
 };
 
 function StatCard({
@@ -175,6 +188,43 @@ function WeeklyBarChart({ data }: { data: WeeklyLoginPoint[] }) {
 	);
 }
 
+function CountryBarChart({ data }: { data: CountrySlice[] }) {
+	const max = Math.max(...data.map((item) => item.count));
+
+	return (
+		<div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl shadow-black/10 backdrop-blur-md">
+			<div className="flex items-start justify-between gap-4">
+				<div>
+					<p className="text-sm font-semibold text-white">Users by country</p>
+					<p className="mt-1 text-xs text-white/50">Where the current user base is coming from, using mocked distribution data.</p>
+				</div>
+				<Globe2 className="h-5 w-5 text-white/35" />
+			</div>
+
+			<div className="mt-5 space-y-3">
+				{data.map((item) => {
+					const width = Math.max(12, (item.count / max) * 100);
+
+					return (
+						<div key={item.label} className="rounded-2xl border border-white/10 bg-slate-950/30 p-3">
+							<div className="flex items-center justify-between gap-3 text-sm">
+								<div>
+									<p className="font-semibold text-white">{item.label}</p>
+									<p className="text-xs text-white/45">{item.count} users</p>
+								</div>
+								<p className="font-semibold text-white">{Math.round((item.count / data.reduce((sum, current) => sum + current.count, 0)) * 100)}%</p>
+							</div>
+							<div className="mt-3 h-2 rounded-full bg-white/8">
+								<div className="h-2 rounded-full" style={{ width: `${width}%`, backgroundColor: item.color }} />
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
 export default function ModDashboardComponent() {
 	const data = useMemo(() => monitoringTemplate, []);
 	const onlineRate = Math.round((data.onlineUsers / data.totalUsers) * 100);
@@ -272,6 +322,10 @@ export default function ModDashboardComponent() {
 				<div className="mt-5 grid gap-5 xl:grid-cols-2">
 					<DonutChart title="Gender distribution" subtitle="Template-based distribution using users.gender as the source of truth." data={data.gender} />
 					<DonutChart title="Orientation distribution" subtitle="Template-based split using users.sexual_orientation and existing profile categories." data={data.orientation} />
+				</div>
+
+				<div className="mt-5">
+					<CountryBarChart data={data.countries} />
 				</div>
 
 				<div className="mt-5">

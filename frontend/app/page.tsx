@@ -19,9 +19,9 @@ import StartPage from "./components/public/startPage";
 
 export default function Home() {
 	return (
-		<>
+		<main className="flex flex-col items-center justify-start min-h-screen w-full gap-16">
 			<Header />
 			<StartPage />
-		</>
+		</main>
 	);
 }
