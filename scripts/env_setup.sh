@@ -35,4 +35,6 @@ POSTGRES_PASSWORD=$DB_PASSWORD
 POSTGRES_DB=$DB_NAME
 EOF
 
+
+
 echo -e "${GREEN}.env files generated successfully.${RESET}"

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Home, LogOut, UserPlus } from "lucide-react";
+import { FileText, Home, LogOut, Settings, UserPlus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -33,6 +33,7 @@ export default function ModSidebar({ children }: { children?: ReactNode }) {
 		{ icon: Home, title: "Home", ref: "/mod/dashboard", handler: () => router.push("/mod/dashboard") },
 		{ icon: UserPlus, title: "Register", ref: "/mod/register", handler: () => router.push("/mod/register") },
 		{ icon: FileText, title: "Reports", ref: "/mod/reports", handler: () => router.push("/mod/reports") },
+		{ icon: Settings, title: "Settings", ref: "/mod/settings", handler: () => router.push("/mod/settings") },
 	];
 
 	const spaceLayout = "flex min-h-0 flex-1 items-center justify-center px-6 pb-20 md:px-10 md:pb-0 md:pl-24";

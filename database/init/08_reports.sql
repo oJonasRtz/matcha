@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS reports (
 	reporter_id INTEGER NOT NULL,
 	reported_id INTEGER NOT NULL,
 	reason TEXT NOT NULL,
+	details TEXT,
 	reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,

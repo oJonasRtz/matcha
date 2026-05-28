@@ -13,5 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
 	age INTEGER NOT NULL DEFAULT 18,
 	frame_rate INTEGER NOT NULL DEFAULT 0,
 	is_online BOOLEAN NOT NULL DEFAULT FALSE,
-	last_online TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	last_online TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	restricted BOOLEAN NOT NULL DEFAULT FALSE,
+	restriction_reason TEXT,
+	restriction_expires TIMESTAMPTZ,
+	moderator_who_restricted INTEGER,
+
+	FOREIGN KEY (moderator_who_restricted) REFERENCES moderators(id) ON DELETE SET NULL
 );
