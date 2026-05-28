@@ -9,7 +9,7 @@ export default function UserImages(
 ) {
 	// === STYLES ===
 	const mainStyle = "space-y-4";
-	const navButtonsStyle = "absolute top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white";
+	const navButtonsStyle = "absolute top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white shadow-lg";
 	
 	// === STATES ===
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -78,7 +78,7 @@ export default function UserImages(
 				<img
 					src={images[activeIndex]}
 					alt={`Profile photo ${activeIndex + 1}`}
-					className="h-[420px] w-full object-cover md:h-[560px]"
+					className="h-[480px] w-full object-cover md:h-[720px] lg:h-[820px]"
 				/>
 
 				{/*	Nav buttons */}
@@ -94,31 +94,24 @@ export default function UserImages(
 			</section>
 
 			{/*	===	Small Images Section === */}
-			<section className="flex justify-between flex-[1] grid grid-cols-5 gap-2">
+			<section className="flex flex-col gap-2 md:grid md:grid-cols-5 md:items-start">
 				{images.map((image, index) => (
 					<button
 						key={`${image}-thumb`}
 						type="button"
 						onClick={() => setActiveIndex(index)}
 						className={[
-							"overflow-hidden rounded-xl border transition",
+							"overflow-hidden rounded-xl transition shadow-sm",
 							index === activeIndex
-								? "border-pink-400 ring-1 ring-pink-400"
-								: "border-white/20 hover:border-white/40",
+								? "ring-2 ring-pink-400"
+								: "border border-white/10 hover:border-white/30",
 						].join(" ")}
 						aria-label={`View profile photo ${index + 1}`}
 					>
 						<img
-							key={`${image}-thumb`}
 							src={image}
 							alt={`Thumbnail of profile photo ${index + 1}`}
-							onClick={() => setActiveIndex(index)}
-							className={[
-								"overflow-hidden rounded-xl border transition",
-								index === activeIndex
-									? "border-pink-400 ring-1 ring-pink-400"
-									: "border-white/20 hover:border-white/40",
-							].join(" ")}
+							className="h-20 w-full object-cover md:h-24 lg:h-28"
 						/>
 					</button>
 				))}

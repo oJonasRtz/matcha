@@ -65,14 +65,13 @@ const notifications = [
 export default async function NotificationsPage() {
 	await CheckLogin();
 	
-	// ===== STYLES =====
-	const mainStyle = "flex min-h-screen items-stretch";
+	const mainStyle = "flex min-h-screen w-full bg-[radial-gradient(circle_at_top,rgba(244,63,94,0.18),rgba(15,23,42,0.96)_40%),linear-gradient(180deg,rgba(20,6,18,0.98),rgba(10,2,10,0.98))]";
 
 	return (
 		<main className={mainStyle}>
-		<Sidebar>
-			<NotificationsContainer n={notifications} />
-		</Sidebar>
+			<Sidebar>
+				<NotificationsContainer n={notifications} />
+			</Sidebar>
 		</main>
 	)
 }

@@ -37,9 +37,13 @@ fclean:
 	@rm -f ./server/certificates/*.crt
 	@rm -f ./server/certificates/*.cert
 	@rm -f ./server/certificates/*.key
-	@rm -f backend/.env
-	@rm -f frontend/.env
-	@rm -f database/.env
+	# ensure files are writable before removing to avoid permission errors
+	@for f in ./server/certificates/*.crt ./server/certificates/*.cert ./server/certificates/*.key backend/.env frontend/.env database/.env; do \
+		if [ -e "$$f" ]; then \
+			chmod u+w "$$f" 2>/dev/null || true; \
+			rm -f "$$f" || true; \
+		fi; \
+	done
 
 check-env:
 	@missing=0; \
@@ -54,7 +58,7 @@ check-env:
 	fi
 
 tls:
-	if [ -f "./server/certificates/server.cert" ] && [ -f "./server/certificates/server.key" ]; then \
+	@if [ -f "./server/certificates/server.cert" ] && [ -f "./server/certificates/server.key" ]; then \
 		echo "${GREEN}===== TLS certificates already exist. Skipping generation. =====${RESET}"; \
 	else \
 		echo "${GREEN}===== Generating TLS certificates... =====${RESET}"; \

@@ -18,8 +18,9 @@ export default function Statistics(
 	const title = "text-xl font-bold ";
 
 	return (
-		<Card className="text-white flex flex-col gap-4">
+		<Card className="flex flex-col gap-4 border-rose-300/20 bg-black/35 text-white">
 			<header>
+				<p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-200/75">Overview</p>
 				<h1 className={title}>Overview</h1>
 			</header>
 
@@ -36,26 +37,29 @@ export default function Statistics(
 						<section className="flex flex-col gap-4">
 
 							<section className="flex gap-4">
-								<Card className="flex flex-col gap-4 justify-center items-center flex-1">
+								<Card className="flex flex-1 flex-col items-center justify-center gap-4 border-rose-300/20 bg-rose-500/10">
 									<h3 className="text-lg font-semibold">Total</h3>
 									<strong className="text-2xl font-bold">{total}</strong>
 								</Card>
-								<Card className="flex flex-col gap-4 justify-center items-center flex-1">
+								<Card className="flex flex-1 flex-col items-center justify-center gap-4 border-rose-300/20 bg-rose-500/10">
 									<h3 className="text-lg font-semibold">Unread</h3>
 									<strong className="text-2xl font-bold">{unread}</strong>
 								</Card>
 							</section>
-							<div className="flex flex-col gap-2">
+							<div className="rounded-2xl border border-white/10 bg-white/5 p-3">
 								<strong>By Type:</strong>
-								<ul className="list-disc list-inside">
+								<ul className="mt-2 space-y-1">
 									{Object.entries(typesCount).map(([type, count]) => {
 										const Badge = typeColours[type].badge;
 										const colour = typeColours[type].color;
 
 										return (
-											<li key={type} className={`flex items-center gap-2`}>
+											<li key={type} className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2">
+												<div className="flex items-center gap-2">
 												<Badge className={`h-4 w-4 ${colour}`} />
-												{type.charAt(0).toUpperCase() + type.slice(1)}: {count}
+												<span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+												</div>
+												<span className="font-semibold">{count}</span>
 											</li>
 										)
 									})}

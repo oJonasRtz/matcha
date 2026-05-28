@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Image, Paperclip, Send, Video } from "lucide-react";
-
-export default function SimpleChatComponent() {
-// define the currentUser before the useState
+import { useMemo, useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import ChatContacts from "./chatContacts";
 
 type ChatMessage = {
   id: number;
   sender: string;
-  letter: string;
   avatar: string;
   content: string;
   time: string;
@@ -24,159 +22,126 @@ type Conversation = {
   messages: ChatMessage[];
 };
 
-type TargetUser = {
-  name: string;
-  status: string;
-  avatar: string;
-};
-
 const currentUser = {
   name: "Haseo",
-  letter: "H",
-  status: "online",
-  avatar:
-    "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
+  avatar: "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
 };
 
-const [targetUser, setTargetUser] = useState<TargetUser>({
-  name: "Nami",
-  status: "online",
-  avatar: "https://i.redd.it/kij6hdu9sb8b1.png"
-});
-
+export default function SimpleChatComponent() {
+  const searchParams = useSearchParams();
   const [text, setText] = useState("");
-const [activeConversationId, setActiveConversationId] = useState("nami");
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
-function handleSelectConversation(conversation: Conversation) {
-  setActiveConversationId(conversation.id);
+  const [conversations, setConversations] = useState<Conversation[]>([
+    {
+      id: "nami",
+      name: "Nami",
+      avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
+      status: "online",
+      messages: [
+        {
+          id: 1,
+          sender: "Nami",
+          avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
+          content: "Hello! What do you think about going to the beach tomorrow?",
+          time: "09:12",
+        },
+        {
+          id: 2,
+          sender: "Haseo",
+          avatar: currentUser.avatar,
+          content: "Yes, I would like that.",
+          time: "09:13",
+        },
+      ],
+    },
+    {
+      id: "atoli",
+      name: "Atoli",
+      avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
+      status: "offline",
+      messages: [
+        {
+          id: 1,
+          sender: "Atoli",
+          avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
+          content: "Haseo, are you there?",
+          time: "10:20",
+        },
+      ],
+    },
+    {
+      id: "ino",
+      name: "Ino",
+      avatar: "https://i.redd.it/i9kw0g493lgb1.jpg",
+      status: "typing...",
+      messages: [
+        {
+          id: 1,
+          sender: "Ino",
+          avatar: "https://i.redd.it/i9kw0g493lgb1.jpg",
+          content: "Let's talk later!",
+          time: "11:03",
+        },
+      ],
+    },
+  ]);
 
-  setTargetUser({
-    name: conversation.name,
-    status: conversation.status,
-    avatar: conversation.avatar
-  });
+  const activeConversationId = searchParams.get("with") ?? conversations[0]?.id ?? "";
+  const activeConversation =
+    conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0];
 
-  setText("");
-}
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container || !activeConversation) return;
+    // scroll to bottom whenever active conversation messages change
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+  }, [conversations, activeConversationId]);
 
-const [conversations, setConversations] = useState<Conversation[]>([
-  {
-    id: "nami",
-    name: "Nami",
-    avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-    status: "online",
-    messages: [
-      {
-        id: 1,
-        sender: "Nami",
-        letter: "N",
-        avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-        content: "Hello! What do you think about to go to the beach tomorrow?",
-        time: "09:12",
-      },
-      {
-        id: 2,
-        sender: "Haseo",
-        letter: "H",
-        avatar: currentUser.avatar,
-        content: "Yes, I would also like to go to the beach with you.",
-        time: "09:13",
-      },
-      {
-        id: 3,
-        sender: "Nami",
-        letter: "N",
-        avatar: "https://i.redd.it/kij6hdu9sb8b1.png",
-        content: "That's perfect. See you tomorrow =D",
-        time: "09:14",
-      },
-    ],
-  },
-  {
-    id: "atoli",
-    name: "Atoli",
-    avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
-    status: "offline",
-    messages: [
-      {
-        id: 1,
-        sender: "Atoli",
-        letter: "A",
-        avatar: "https://s1.zerochan.net/Atoli.600.766556.jpg",
-        content: "Haseo, are you there?",
-        time: "10:20",
-      },
-    ],
-  },
-  {
-    id: "ino",
-    name: "Ino",
-    avatar:
-     "https://i.redd.it/i9kw0g493lgb1.jpg",
-    status: "typing...",
-    messages: [
-      {
-        id: 1,
-        sender: "Ino",
-        letter: "I",
-        avatar: "https://i.redd.it/i9kw0g493lgb1.jpg", 
-        content: "Let's talk later, Haseeeeeoooooo! =D",
-        time: "11:03",
-      },
-    ],
-  },
-]);
-
-const activeConversation =
-  conversations.find((conversation) => conversation.id === activeConversationId) ||
-  conversations[0];
-  const people = useMemo(
-    () => [
-      {
-        name: targetUser.name,
-        avatar: targetUser.avatar,
-        status: targetUser.status,
-      },
-      {
-        name: "Haseo",
-        avatar: "https://i.pinimg.com/originals/b1/39/f9/b139f929824da7a718c6c58b6e588980.jpg",
-        status: "typing...",
-      },
-    ],
-    [targetUser]
+  const contacts = useMemo(
+    () =>
+      conversations.map((conversation) => ({
+        id: conversation.id,
+        name: conversation.name,
+        avatar: conversation.avatar,
+        status: conversation.status,
+        lastMessage: conversation.messages[conversation.messages.length - 1]?.content ?? "",
+      })),
+    [conversations]
   );
 
-function handleSend() {
-  const value = text.trim();
-  if (!value) return;
+  function handleSend() {
+    const value = text.trim();
+    if (!value || !activeConversation) return;
 
-  const newMessage = {
-    id: Date.now(),
-    sender: currentUser.name,
-    letter: currentUser.letter,
-    avatar: currentUser.avatar,
-    content: value,
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  };
+    const newMessage: ChatMessage = {
+      id: Date.now(),
+      sender: currentUser.name,
+      avatar: currentUser.avatar,
+      content: value,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-  setConversations((current) =>
-    current.map((conversation) => {
-      if (conversation.id !== activeConversationId) {
-        return conversation;
+    setConversations((current) =>
+      current.map((conversation) =>
+        conversation.id === activeConversation.id
+          ? { ...conversation, messages: [...conversation.messages, newMessage] }
+          : conversation
+      )
+    );
+
+    setText("");
+    // after sending, scroll to bottom
+    setTimeout(() => {
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
       }
-
-      return {
-        ...conversation,
-        messages: [...conversation.messages, newMessage],
-      };
-    })
-  );
-
-  setText("");
-}
+    }, 60);
+  }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -185,196 +150,101 @@ function handleSend() {
     }
   }
 
+  if (!activeConversation) {
+    return (
+      <div className="grid h-full place-items-center rounded-3xl border border-white/10 bg-black/35 text-white/70">
+        No conversations available.
+      </div>
+    );
+  }
+
   return (
-	<div className="w-full h-full min-h-0 min-w-0 bg-slate-100 overflow-hidden">
-	<div className="w-full h-full min-w-0 min-h-0 bg-white shadow-xl border border-slate-200 overflow-hidden grid grid-cols-[300px_minmax(0,1fr)_120px]">
-<aside className="h-full min-h-0 overflow-y-auto bg-white border-l border-slate-200 p-4">
-  <div className="mb-4">
-    <h2 className="text-sm font-semibold text-slate-900">
-      Conversations
-    </h2>
-    <p className="text-xs text-slate-500">
-      Select a chat
-    </p>
-  </div>
+    <div className="grid h-full min-h-0 min-w-0 gap-4 xl:grid-cols-[320px_minmax(0,1fr)_120px]">
+      <ChatContacts contacts={contacts} activeId={activeConversation.id} />
 
-  <div className="flex flex-col gap-3">
-    {conversations.map((conversation) => {
-      const isActive = conversation.id === activeConversationId;
-      const lastMessage =
-        conversation.messages[conversation.messages.length - 1];
-
-      return (
-        <button
-          key={conversation.id}
-          type="button"
-          onClick={() => handleSelectConversation(conversation)}
-          className={`w-full min-w-0 rounded-2xl border p-3 text-left transition ${
-            isActive
-              ? "border-slate-900 bg-slate-900 text-white"
-              : "border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100"
-          }`}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src={conversation.avatar}
-              alt={conversation.name}
-              className="h-12 w-12 rounded-full object-cover shrink-0"
-            />
-
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">
-                {conversation.name}
-              </div>
-
-              <div
-                className={`text-xs truncate ${
-                  isActive ? "text-slate-300" : "text-slate-500"
-                }`}
-              >
-                {lastMessage?.content}
-              </div>
-            </div>
+      <section className="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-3xl border border-rose-300/20 bg-black/35">
+        <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <div>
+            <h1 className="text-lg font-bold text-white">Chat with {activeConversation.name}</h1>
+            <p className="text-sm text-white/60">Private conversation</p>
           </div>
-        </button>
-      );
-    })}
-  </div>
-</aside>
-	<section className="min-h-0 min-w-0 overflow-hidden grid grid-rows-[auto_minmax(0,1fr)_auto]">
-          <header className="border-b border-slate-200 px-6 py-4 flex items-center justify-between bg-white">
-            <div>
-              <h1 className="text-lg font-semibold text-slate-900"><strong>Seductor Chat</strong></h1>
-              <p className="text-sm text-slate-500">Private chat</p>
-            </div>
-            <div className="text-sm text-slate-400">Only you and me =D</div>
-          </header>
-<div className="min-h-0 min-w-0 overflow-y-auto overflow-x-hidden bg-slate-50 p-6 flex flex-col gap-4">
-	{activeConversation.messages.map((message) => {
-  		const isRight = message.sender === currentUser.name;
+          <span className="rounded-full border border-rose-300/20 bg-rose-500/10 px-3 py-1 text-xs text-rose-100/80">
+            {activeConversation.status}
+          </span>
+        </header>
 
+        <div ref={messagesContainerRef} className="min-h-0 overflow-y-auto px-5 py-4">
+          <div className="flex flex-col gap-3">
+            {activeConversation.messages.map((message) => {
+              const isRight = message.sender === currentUser.name;
               return (
-                <div
-                  key={message.id}
-                  className={`min-w-0 flex items-end gap-3 ${
-                    isRight ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {!isRight && (
-                    <div className="h-14 w-14 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold shrink-0">
-		    <Link href="#" className="block h-full w-full">
-                      <img src={message.avatar} alt={message.letter} className="h-full w-full rounded-full object-cover"/>
-		   </Link>
-                    </div>
-                  )}
+                <div key={message.id} className={`flex items-end gap-3 ${isRight ? "justify-end" : "justify-start"}`}>
+                  {!isRight ? <img src={message.avatar} alt={message.sender} className="h-10 w-10 rounded-full object-cover" /> : null}
 
                   <div
-                    className={`max-w-[75%] min-w-0 break-words [overflow-wrap:anywhere] rounded-2xl px-4 py-3 shadow-sm ... ${
+                    className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm ${
                       isRight
-                        ? "bg-slate-900 text-white rounded-br-md"
-                        : "bg-white text-slate-800 rounded-bl-md border border-slate-200"
+                        ? "rounded-br-md bg-gradient-to-r from-rose-500 to-red-500 text-white"
+                        : "rounded-bl-md border border-white/10 bg-white/8 text-white"
                     }`}
                   >
-                    <div className="text-xs opacity-70 mb-1">
-                      <strong>{message.sender} • {message.time}</strong>
-                    </div>
-                    <p className="text-sm leading-relaxed"><strong>{message.content}</strong></p>
+                    <p className="mb-1 text-[11px] opacity-75">{message.sender} • {message.time}</p>
+                    <p>{message.content}</p>
                   </div>
 
-                  {isRight && (
-                    <div className="h-14 w-14 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold shrink-0">
-                      <Link href="#" className="block h-full w-full">
-                      <img src={message.avatar} alt={message.letter} className="h-full w-full rounded-full object-cover"/>
-		     </Link>
-                    </div>
-                  )}
+                  {isRight ? <img src={message.avatar} alt={message.sender} className="h-10 w-10 rounded-full object-cover" /> : null}
                 </div>
               );
             })}
           </div>
+        </div>
 
-          <div className="border-t border-slate-200 bg-white p-4">
-            <div className="flex items-end gap-3 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 shadow-sm">
-              <div className="flex shrink-0 items-center gap-2 pb-1">
-                <button
-                  type="button"
-                  className="h-12 w-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 transition"
-                  aria-label="Enviar foto"
-                >
-                  <Image size={22} />
-                </button>
-                <button
-                  type="button"
-                  className="h-12 w-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 transition"
-                  aria-label="Send video"
-                >
-                  <Video size={22} />
-                </button>
-                <button
-                  type="button"
-                  className="h-12 w-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 transition"
-                  aria-label="Anexar arquivo"
-                >
-                  <Paperclip size={22} />
-                </button>
-              </div>
-
-              <textarea
-                value={text}
-                onChange={(event) => setText(event.target.value)}
-                onKeyDown={handleKeyDown}
-                rows={1}
-                placeholder="Type a message..."
-                className="flex-1 min-w-0 resize-none bg-transparent outline-none text-sm text-slate-800 placeholder:text-slate-400 py-2 max-h-28"
-              />
-
-              <button
-                type="button"
-                onClick={handleSend}
-                className="h-12 w-12 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:opacity-90 transition shrink-0"
-                aria-label="Enviar mensagem"
-              >
-                <Send size={22} />
+        <div className="border-t border-white/10 p-4">
+          <div className="flex items-end gap-3 rounded-2xl border border-white/15 bg-white/5 px-3 py-3">
+            <div className="flex items-center gap-2 pb-1">
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/8 text-white/75 transition hover:bg-white/15">
+                <Image size={18} />
+              </button>
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/8 text-white/75 transition hover:bg-white/15">
+                <Video size={18} />
+              </button>
+              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/8 text-white/75 transition hover:bg-white/15">
+                <Paperclip size={18} />
               </button>
             </div>
-          </div>
-        </section>
-	<aside className="h-full min-h-0 shrink-0 overflow-hidden bg-slate-900 text-white flex flex-col items-center py-6 gap-5">
-<div className="text-xs uppercase tracking-[0.3em] text-slate-400">
-    Chat
-  </div>
 
-<div className="flex-1 min-h-0 flex flex-col items-center gap-4 mt-4">
-    {people.map((person) => (
-      <div
-        key={person.name}
-        className="flex flex-col items-center gap-2"
-        title={person.name}
-      >
-        <div className="h-16 w-16 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold border border-slate-500 shrink-0">
-          <Link href="#" className="block h-full w-full">
-            <img
-              src={person.avatar}
-              alt={person.name}
-              className="h-full w-full rounded-full object-cover"
+            <textarea
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+              placeholder="Type a message..."
+              className="max-h-24 min-w-0 flex-1 resize-none bg-transparent py-2 text-sm text-white outline-none placeholder:text-white/45"
             />
-          </Link>
-        </div>
 
-        <div className="text-[14px] text-center leading-tight text-slate-300 max-w-[60px]">
-          <div className="font-medium text-white">
-            <strong>{person.name}</strong>
-          </div>
-          <div>
-            <strong>{person.status}</strong>
+            <button
+              type="button"
+              onClick={handleSend}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-rose-500 to-red-500 text-white transition hover:from-rose-400 hover:to-red-400"
+            >
+              <Send size={18} />
+            </button>
           </div>
         </div>
-      </div>
-    ))}
-  </div>
-</aside>
-      </div>
+      </section>
+
+      <aside className="hidden flex-col items-center gap-4 overflow-hidden rounded-3xl border border-rose-300/20 bg-black/35 py-5 text-white xl:flex">
+        <p className="text-xs uppercase tracking-[0.22em] text-white/45">People</p>
+        {[activeConversation, { name: currentUser.name, avatar: currentUser.avatar, status: "online", id: "you", messages: [] }].map((person) => (
+          <div key={person.id} className="flex flex-col items-center gap-2 px-2 text-center">
+            <Link href="#" className="block">
+              <img src={person.avatar} alt={person.name} className="h-14 w-14 rounded-full border border-white/15 object-cover" />
+            </Link>
+            <p className="text-xs font-semibold text-white">{person.name}</p>
+            <p className="text-[11px] uppercase tracking-[0.08em] text-white/50">{person.status}</p>
+          </div>
+        ))}
+      </aside>
     </div>
   );
 }
-

@@ -41,7 +41,7 @@ const monitoringTemplate = {
 	] satisfies GenderSlice[],
 	orientation: [
 		{ label: "Heterosexual", value: 48, count: 599, color: "#22c55e" },
-		{ label: "Gay / Lesbian", value: 24, count: 299, color: "#38bdf8" },
+		{ label: "Homossexual", value: 24, count: 299, color: "#38bdf8" },
 		{ label: "Bisexual", value: 21, count: 262, color: "#f59e0b" },
 		{ label: "Other", value: 7, count: 88, color: "#a78bfa" },
 	] satisfies OrientationSlice[],

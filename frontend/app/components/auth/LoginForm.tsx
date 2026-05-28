@@ -18,8 +18,8 @@ export default function LoginForm() {
   ];
 
   const footerLinks = [
-    { label: "Terms of Service", action: () => router.push("#") },
-    { label: "Privacy Policy", action: () => router.push("#") },
+    { label: "Terms of Service", action: () => router.push("/terms") },
+    { label: "Privacy Policy", action: () => router.push("/policy") },
   ];
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

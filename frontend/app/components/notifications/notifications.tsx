@@ -25,14 +25,13 @@ export default function Notifications(
 
 	const router = useRouter();
 
-	// ===== STYLES =====
-	const headerStyle = "w-full h-16 flex items-center";
+	const headerStyle = "w-full min-h-16 flex flex-wrap items-start gap-3 md:items-center";
 	const title = "mt-3 text-3xl font-semibold md:text-4xl";
 
 
 	// == Buttons ==
 	const buttonStyle = "px-4 py-4 rounded-lg transition flex items-center gap-2 hover:cursor-pointer";
-	const primaryButton = "bg-pink-500 hover:bg-pink-600 text-white";
+	const primaryButton = "bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-400 hover:to-red-400 text-white";
 	const outlineButton = "border border-white/20 hover:bg-white/10 text-white";
 
 	const badgeStyle = "h-12 w-12 shrink-0";
@@ -58,16 +57,17 @@ export default function Notifications(
 	}
 
 	return (
-		<Card className="flex flex-col text-white gap-6 max-h-screen">
+		<Card className="flex max-h-screen flex-col gap-6 border-rose-300/20 bg-black/35 text-white">
 			<header className={headerStyle}>
 				<div className="flex flex-col gap-1">
+					<p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-200/75">Notifications</p>
 					<h1 className={title}>Notifications Center</h1>
-					<p className="text-sm text-slate-400">
+					<p className="text-sm text-white/60">
 						See everything that's happened with your account.
 					</p>
 				</div>
 
-				<div className="ml-auto flex gap-4">
+				<div className="ml-auto flex flex-wrap gap-3">
 					{actions.map(({ label, variant, badge: Badge, click }) => (
 						<button
 							key={label}
@@ -86,13 +86,13 @@ export default function Notifications(
 			</header>
 
 			{/*	FILTERS */}
-			<div className="flex gap-4">
+			<div className="flex flex-wrap gap-2">
 				{filters.map((filter) => (
 					<button
 						key={filter}
 						className={`px-3 py-1 rounded-full text-sm transition hover:cursor-pointer ${
 							activeFilter === filter
-								? "bg-pink-500 text-white"
+								? "bg-gradient-to-r from-rose-500 to-red-500 text-white"
 								: "bg-white/10 text-white/80 hover:bg-white/20"
 						}`}
 						onClick={() => setActiveFilter(filter)}
@@ -103,9 +103,9 @@ export default function Notifications(
 			</div>
 
 			{/*	SHOW NOTIFICATIONS */}
-			<main className="flex flex-col gap-4 overflow-y-auto">
+			<main className="flex flex-col gap-4 overflow-y-auto pr-1">
 				{notifications.map(({id, type, content, time, read}) => (
-					<Card className="flex gap-2 items-start relative p-4 hover:border hover:border-white" key={id}>
+					<Card className="relative flex items-start gap-2 border-white/10 bg-white/5 p-4 transition hover:border-rose-300/35" key={id}>
 						{(() => {
 							const { badge: Badge, color } = typeColours[type];
 							return <Badge className={`${badgeStyle} ${color}`} />;
@@ -115,7 +115,7 @@ export default function Notifications(
 						<section className="flex flex-col flex-1 min-w-0">
 							<h2 className="text-lg font-semibold">{content}</h2>
 
-							<p className="text-sm text-slate-400 mt-1">
+							<p className="mt-1 text-sm text-white/50">
 								{(() => {
 									const diff = Date.now() - time;
 									if (diff < 60 * 1000) return "Just now";
@@ -128,7 +128,7 @@ export default function Notifications(
 
 						{/*	=== ACTIONS === */}
 						<button
-							className="text-sm bg-slate-600 hover:bg-slate-500 text-white py-2 px-4 rounded-lg transition hover:shadow-md hover:cursor-pointer"
+							className="rounded-lg bg-gradient-to-r from-rose-500 to-red-500 px-4 py-2 text-sm text-white transition hover:from-rose-400 hover:to-red-400 hover:shadow-md"
 							onClick={() => {
 								const urlMap: Record<string, string> = {
 									like: "/profile", // this could be a specific page showing who liked you
@@ -148,7 +148,7 @@ export default function Notifications(
 						</button>
 
 						{/*	=== UNREAD DOT === */}
-						{!read && <span className="absolute top-2 right-2 h-3 w-3 rounded-full bg-pink-400" />}
+						{!read && <span className="absolute right-2 top-2 h-3 w-3 rounded-full bg-rose-400" />}
 					</Card>
 				))}
 			</main>

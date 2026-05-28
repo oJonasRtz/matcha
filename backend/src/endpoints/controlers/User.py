@@ -48,6 +48,19 @@ class UserController:
 		password = data["password"]
 		if not is_strong_password(password):
 			return jsonify({"error": "Weak password."}), 400
+
+		# validate birthday and age >= 18
+		try:
+			from datetime import datetime
+			if "birthday" not in data or not data.get("birthday"):
+				return jsonify({"error": "Missing birthday."}), 400
+			b = datetime.fromisoformat(data.get("birthday"))
+			now = datetime.utcnow()
+			age = now.year - b.year - ((now.month, now.day) < (b.month, b.day))
+			if age < 18:
+				return jsonify({"error": "Must be 18 or older."}), 400
+		except Exception:
+			return jsonify({"error": "Invalid birthday format. Use YYYY-MM-DD."}), 400
 		hashed_password = bcrypt.hashpw(
 				password.encode('utf-8'),
 				bcrypt.gensalt()
@@ -62,12 +75,14 @@ class UserController:
 						email,
 						firstname,
 						lastname,
+						birthday,
+						age,
 						gender,
 						sexual_orientation,
 						is_online,
 						last_online
 					)
-					VALUES (%s, %s, %s, %s, %s, %s, TRUE, NOW())
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, TRUE, NOW())
 					RETURNING id, public_id
 				)
 				INSERT INTO auth (user_id, password_hash)
@@ -80,6 +95,8 @@ class UserController:
 					data["email"],
 					data["firstname"],
 					data["lastname"],
+					data.get("birthday"),
+					age,
 					data["gender"],
 					data["sexual_orientation"],
 					hashed_password

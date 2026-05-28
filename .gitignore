@@ -1,5 +1,8 @@
 *.env
 
+# Node dependencies
+node_modules/
+
 # TLS certificates
 *.cert
 *.key

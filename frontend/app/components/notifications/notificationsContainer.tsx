@@ -42,11 +42,11 @@ export default function NotificationsContainer(
 			badge: UserRoundSearch
 		}
 	};
-		const sectionStyle = "flex-1 min-w-0 w-full flex flex-wrap gap-6 px-6 py-4";
+		const sectionStyle = "mx-auto flex w-full max-w-[1320px] flex-1 flex-wrap gap-6 px-4 py-6 md:px-6 md:py-8";
 
 	// ===== LAYOUT DIVISION =====
-	const focus = "flex-[2]"; // takes up 2 parts of the available space
-	const rightSide = "flex-[1] flex flex-col gap-6"; // fixed width for desktop, full width for mobile
+	const focus = "xl:flex-[2]";
+	const rightSide = "xl:flex-[1] flex flex-col gap-6";
 
 	return (
 		<main className={sectionStyle}>

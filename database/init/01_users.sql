@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 	gender VARCHAR(50) NOT NULL,
 	sexual_orientation VARCHAR(50) NOT NULL DEFAULT 'bisexual',
 	bio TEXT DEFAULT '',
+	birthday DATE,
 	age INTEGER NOT NULL DEFAULT 18,
 	frame_rate INTEGER NOT NULL DEFAULT 0,
 	is_online BOOLEAN NOT NULL DEFAULT FALSE,

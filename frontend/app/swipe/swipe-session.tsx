@@ -24,6 +24,9 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [likedUsers, setLikedUsers] = useState<Record<string, boolean>>({});
 	const [reportedUsers, setReportedUsers] = useState<Record<string, boolean>>({});
+	const [localUsers, setLocalUsers] = useState<UserData[]>(users);
+	const originalUsersRef = useRef<UserData[]>(users);
+	const [swipeRegionName, setSwipeRegionName] = useState<string | null>(null);
 
 	useEffect(() => {
 		const container = scrollContainerRef.current;
@@ -60,7 +63,7 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 		});
 
 		return () => observer.disconnect();
-	}, [users]);
+		}, [localUsers]);
 
 	function scrollToIndex(index: number) {
 		const nextIndex = Math.min(Math.max(index, 0), users.length - 1);
@@ -82,17 +85,47 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 	}
 
 	const gradients = [
-		"from-rose-500/30 via-black/10 to-sky-500/25",
-		"from-cyan-500/30 via-black/10 to-violet-500/25",
-		"from-amber-500/30 via-black/10 to-fuchsia-500/25",
-		"from-emerald-500/30 via-black/10 to-indigo-500/25",
+		"from-rose-500/30 via-black/15 to-red-500/25",
+		"from-pink-500/30 via-black/15 to-rose-400/25",
+		"from-red-500/30 via-black/15 to-orange-400/25",
+		"from-fuchsia-500/30 via-black/15 to-rose-500/25",
 	];
+
+	useEffect(() => {
+		// simulate infinite scrolling by appending more users when near the end
+		if (currentIndex >= localUsers.length - 3) {
+			const more = originalUsersRef.current.map((u, i) => ({ ...u, name: `${u.name}-${Date.now()}-${i}` }));
+			setLocalUsers((cur) => [...cur, ...more]);
+		}
+	}, [currentIndex, localUsers.length]);
+
+	useEffect(() => {
+		// read saved region from localStorage and prioritize users matching it
+		try {
+			const raw = localStorage.getItem('swipeRegion');
+			if (raw) {
+				const parsed = JSON.parse(raw);
+				const name = parsed.name || parsed.display_name || null;
+				if (name) {
+					setSwipeRegionName(name);
+					setLocalUsers((cur) => {
+						// bring users whose location contains the region name to front
+						const match = cur.filter((u) => u.location && u.location.toLowerCase().includes(name.toLowerCase()));
+						const rest = cur.filter((u) => !u.location || !u.location.toLowerCase().includes(name.toLowerCase()));
+						return [...match, ...rest];
+					});
+				}
+			}
+		} catch (e) {
+			// ignore
+		}
+	}, []);
 
 	return (
 		<main className="relative h-[calc(100vh-5rem)] overflow-hidden px-3 py-3 md:px-6 md:py-6">
 			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_42%),linear-gradient(180deg,_rgba(8,8,12,0.82),_rgba(8,8,12,0.96))]" />
 
-			<div className="relative z-10 mx-auto flex h-full w-full max-w-4xl flex-col gap-4">
+			<div className="relative z-10 mx-auto flex h-full w-full max-w-3xl flex-col gap-4">
 				<header className="flex items-end justify-between gap-3 px-1 pt-1 text-white">
 					<div>
 						<p className="text-xs uppercase tracking-[0.35em] text-white/45">Swipe session</p>
@@ -104,7 +137,7 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 				</header>
 
 				<div ref={scrollContainerRef} className="hide-scrollbar h-full overflow-y-auto snap-y snap-mandatory pb-8 scroll-smooth px-1 md:px-0">
-					{users.map((user, index) => {
+					{localUsers.map((user, index) => {
 						const isLiked = Boolean(likedUsers[user.name]);
 						const isReported = Boolean(reportedUsers[user.name]);
 						const visibleTags = user.tags.slice(0, 4);
@@ -120,8 +153,8 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 								data-index={index}
 								className="flex min-h-full snap-start items-center justify-center py-2 md:py-4"
 							>
-								<article className="mx-auto w-full max-w-xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/8 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl md:max-w-2xl lg:max-w-3xl">
-									<div className={`relative aspect-[4/5] overflow-hidden bg-gradient-to-br ${gradient}`}>
+								<article className="mx-auto w-full max-w-xl overflow-hidden rounded-[2rem] border border-rose-300/20 bg-white/8 shadow-[0_30px_80px_rgba(244,63,94,0.16)] backdrop-blur-xl md:max-w-[820px] lg:max-w-[920px]">
+									<div className={`relative aspect-[4/5] md:aspect-[5/4] overflow-hidden bg-gradient-to-br ${gradient}`}>
 										<img
 											src={user.images[0]}
 											alt={user.name}
@@ -138,7 +171,7 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 												<div className="min-w-0 flex-1 text-white">
 													<Link
 														href="/profile"
-														className="block text-3xl font-semibold leading-none tracking-tight transition hover:text-pink-300 md:text-4xl"
+														className="block text-3xl font-semibold leading-none tracking-tight transition hover:text-rose-200 md:text-4xl"
 													>
 														{user.name}
 													</Link>
@@ -156,15 +189,15 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 										</div>
 									</div>
 
-									<div className="space-y-4 p-4 md:p-5 lg:p-6">
+										<div className="space-y-4 p-4 md:p-5">
 										<div className="flex flex-wrap gap-2">
 											{visibleTags.map((tag) => (
-												<span key={tag} className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/75">
+												<span key={tag} className="rounded-full border border-rose-300/20 bg-rose-500/12 px-3 py-1 text-xs text-rose-100/90">
 													{tag}
 												</span>
 											))}
 											{remainingTags > 0 && (
-												<span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/55">
+												<span className="rounded-full border border-rose-300/20 bg-rose-500/12 px-3 py-1 text-xs text-rose-100/70">
 													+{remainingTags}
 												</span>
 											)}
@@ -178,7 +211,7 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 											<button
 												type="button"
 												onClick={() => toggleLike(user.name)}
-												className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${isLiked ? "bg-pink-500 text-white" : "bg-white text-black hover:bg-pink-100"}`}
+												className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${isLiked ? "bg-gradient-to-r from-rose-500 to-red-500 text-white" : "bg-white text-black hover:bg-rose-100"}`}
 											>
 												<Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
 													Like
@@ -187,7 +220,7 @@ export default function SwipeSession({ users }: SwipeSessionProps) {
 											<button
 												type="button"
 												onClick={() => reportUser(user.name)}
-												className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${isReported ? "border-red-400/60 bg-red-500/15 text-red-200" : "border-white/12 bg-white/6 text-white/80 hover:bg-white/12"}`}
+												className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${isReported ? "border-red-400/60 bg-red-500/15 text-red-200" : "border-rose-300/25 bg-rose-500/8 text-white/85 hover:bg-rose-500/18"}`}
 											>
 												<Flag className="h-4 w-4" />
 												{isReported ? "Reported" : "Report"}

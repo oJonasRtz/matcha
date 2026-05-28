@@ -12,6 +12,7 @@ type RegisterFormData = {
 	username: string;
 	firstname: string;
 	lastname: string;
+	birthday: string;
 	password: string;
 	confirmPassword: string;
 	gender: string;
@@ -27,6 +28,7 @@ export default function RegisterForm() {
 		username: "",
 		firstname: "",
 		lastname: "",
+		birthday: "",
 		password: "",
 		confirmPassword: "",
 		gender: "",
@@ -34,6 +36,7 @@ export default function RegisterForm() {
 	});
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
+	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [passwordStatus, setPasswordStatus] = useState<PasswordStrengthStatus>({
 		isPasswordStrong: false,
 		passwordsMatch: false,
@@ -51,8 +54,8 @@ export default function RegisterForm() {
 	];
 
 	const footerLinks = [
-		{ label: "Terms of Service", action: () => router.push("#") },
-		{ label: "Privacy Policy", action: () => router.push("#") },
+		{ label: "Terms of Service", action: () => router.push("/terms") },
+		{ label: "Privacy Policy", action: () => router.push("/policy") },
 	];
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -65,15 +68,30 @@ export default function RegisterForm() {
 			email: formData.email,
 			firstname: formData.firstname,
 			lastname: formData.lastname,
+			birthday: formData.birthday,
 			gender: formData.gender,
 			// optional with default
 			sexual_orientation: formData.sexualOrientation || "bisexual",
 		};
 
 		// Ensure required fields
-		const missing = ["username", "password", "email", "firstname", "lastname", "gender"].filter((k) => !payload[k as keyof typeof payload]);
+		const missing = ["username", "password", "email", "firstname", "lastname", "gender", "birthday"].filter((k) => !payload[k as keyof typeof payload]);
 		if (missing.length) {
 			setError(`Missing required fields: ${missing.join(", ")}`);
+			return;
+		}
+
+		// validate birthday >= 18 years
+		try {
+			const b = new Date(payload.birthday as string);
+			const now = new Date();
+			const age = now.getFullYear() - b.getFullYear() - (now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate()) ? 1 : 0);
+			if (isNaN(age) || age < 18) {
+				setError("You must be at least 18 years old to register.");
+				return;
+			}
+		} catch (e) {
+			setError("Invalid birthday.");
 			return;
 		}
 
@@ -141,6 +159,12 @@ export default function RegisterForm() {
 			return;
 		}
 
+		if (!acceptedTerms) {
+			e.preventDefault();
+			setError("You must accept the Terms of Service and Privacy Policy to register.");
+			return;
+		}
+
 		handleSubmit(e);
 	}
 
@@ -184,6 +208,7 @@ export default function RegisterForm() {
 							<FloatingLabelInput id="username" name="username" type="text" label="Username" value={formData.username} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("username", event.target.value)} className="w-full text-gray font-bold" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
 							<FloatingLabelInput id="firstname" name="firstname" type="text" label="Firstname" value={formData.firstname} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("firstname", event.target.value)} className="w-full rounded-xl text-gray font-bold" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
 							<FloatingLabelInput id="lastname" name="lastname" type="text" label="Lastname" value={formData.lastname} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("lastname", event.target.value)} className="w-full rounded-xl font-bold text-gray" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
+							<FloatingLabelInput id="birthday" name="birthday" type="date" label="Birthday" value={formData.birthday} onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateField("birthday", event.target.value)} className="w-full rounded-xl font-bold text-gray" focusClassName="focus:border-red-400 focus:ring-2 focus:ring-red-200/40" labelFocusClassName="peer-focus:text-red-300 peer-not-placeholder-shown:text-red-300" required />
 						</>
 					) : null}
 
@@ -232,6 +257,15 @@ export default function RegisterForm() {
 							/>
 						</>
 					) : null}
+
+						{isThirdStep && (
+							<div className="mt-3 mb-2 flex items-start gap-3">
+								<input id="accept" type="checkbox" checked={acceptedTerms} onChange={() => setAcceptedTerms((v) => !v)} className="mt-1 h-4 w-4 rounded" />
+								<label htmlFor="accept" className="text-sm text-white/80">
+									I accept the <button type="button" onClick={() => router.push('/terms')} className="underline">Terms of Service</button> and <button type="button" onClick={() => router.push('/policy')} className="underline">Privacy Policy</button>.
+								</label>
+							</div>
+						)}
 
 					<div className="mt-2 flex gap-3">
 						{!isFirstStep ? (
