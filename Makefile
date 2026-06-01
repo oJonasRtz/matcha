@@ -1,5 +1,11 @@
 COMPOSE = docker compose
 
+ifeq ($(OS),Windows_NT)
+IS_WINDOWS = 1
+else
+IS_WINDOWS = 0
+endif
+
 #colors for output
 GREEN = \033[32m
 RED = \033[31m
@@ -34,6 +40,10 @@ fclean:
 	@docker network prune -f
 
 	@echo "${RED}===== Erasing everything... =====${RESET}"
+
+ifeq ($(IS_WINDOWS),1)
+	@powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/fclean.ps1
+else
 	@rm -f ./server/certificates/*.crt
 	@rm -f ./server/certificates/*.cert
 	@rm -f ./server/certificates/*.key
@@ -44,8 +54,13 @@ fclean:
 			rm -f "$$f" || true; \
 		fi; \
 	done
+endif
 
 check-env:
+
+ifeq ($(IS_WINDOWS),1)
+	@powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check_env.ps1
+else
 	@missing=0; \
 	for dir in backend frontend database; do \
 		if [ ! -f "$$dir/.env" ]; then \
@@ -56,14 +71,20 @@ check-env:
 	if [ $$missing -eq 1 ]; then \
 		bash ./scripts/env_setup.sh; \
 	fi
+endif
 
 tls:
+
+ifeq ($(IS_WINDOWS),1)
+	@powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate_ssl_certs.ps1
+else
 	@if [ -f "./server/certificates/server.cert" ] && [ -f "./server/certificates/server.key" ]; then \
 		echo "${GREEN}===== TLS certificates already exist. Skipping generation. =====${RESET}"; \
 	else \
 		echo "${GREEN}===== Generating TLS certificates... =====${RESET}"; \
 		bash ./scripts/generate_ssl_certs.sh; \
 	fi
+endif
 
 re: down up
 

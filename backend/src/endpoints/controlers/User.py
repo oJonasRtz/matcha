@@ -95,7 +95,7 @@ class UserController:
 					data["email"],
 					data["firstname"],
 					data["lastname"],
-					data.get("birthday"),
+					data["birthday"],
 					age,
 					data["gender"],
 					data["sexual_orientation"],

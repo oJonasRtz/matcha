@@ -42,7 +42,12 @@ Get everything running with one command and access the app through HTTPS.
 
 - Docker and Docker Compose installed
 - `make` available in your shell
-- `.env` files created in both `backend/` and `frontend/`
+- `mkcert` installed and available in `PATH`
+
+Platform notes:
+
+- Linux: current scripts run with `bash`.
+- Windows: `make` runs PowerShell scripts for `.env`/TLS setup. If needed, install mkcert with `winget install FiloSottile.mkcert`.
 
 ### 2. Start the project
 
