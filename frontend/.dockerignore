@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.vscode
+coverage
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

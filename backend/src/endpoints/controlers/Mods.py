@@ -1,3 +1,5 @@
+from ast import mod
+
 from flask import jsonify, g
 from src.objects.Database import Database
 import bcrypt
@@ -17,8 +19,30 @@ class ModsController:
         return [
             ("/mod/logout", cls._logout, ["POST"], "mod_logout"),
             ("/mod/register", cls._register, ["POST"], "mod_register"),
+            ("/mod/checkToken", cls._check_mod, ["GET"], "mod_check_token"),
         ]
     
+    @staticmethod
+    def _check_mod():
+        user = g.user
+
+        try:
+            mod = Database.run_query(
+                """
+                SELECT public_id
+                FROM moderators
+                WHERE public_id = %s
+                """,
+                (user.get("public_id"),),
+                fetch_one=True
+            )
+            if not mod:
+                return jsonify({"error": "Invalid moderator."}), 401
+
+            return jsonify({"message": "Moderator is valid."}), 200
+        except Exception:
+            return jsonify({"error": "Failed to check moderator."}), 400
+
     @staticmethod
     def _login():
         data = g.body

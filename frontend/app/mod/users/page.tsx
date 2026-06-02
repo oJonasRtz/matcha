@@ -6,7 +6,7 @@ export const metadata = {
 };
 
 export default async function ModUsers() {
-	await CheckLogin(1);
+	await CheckLogin("mod");
 
 	return <ModUsersShell />
 }

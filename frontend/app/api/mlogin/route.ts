@@ -1,40 +1,66 @@
+// import { cookies } from "next/headers";
+
+// //https ignore file
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+// export async function POST(req: Request) {
+// 	const body = await req.json();
+
+// 	const res = await fetch("https://backend:5000/mod/login", {
+// 		method: "POST",
+// 		headers: {
+// 			"Content-Type": "application/json",
+// 		},
+// 		body: JSON.stringify(body)
+// 	});
+
+// 	const text = await res.text();
+// 	const data = text ? JSON.parse(text) : {};
+
+// 	if (!res.ok) {
+// 		return new Response(JSON.stringify(data), {
+// 			status: res.status
+// 		});
+// 	}
+
+// 	//JWT on cookies
+// 	const cookieStore = await cookies();
+
+// 	cookieStore.set("token", data.token, {
+// 		httpOnly: true,
+// 		secure: true,
+// 		sameSite: "strict",
+// 		path: "/",
+// 		maxAge: 60 * 60 * 24, // 1 days
+// 	});
+
+// 	return new Response(JSON.stringify({ success: true }), {
+// 		status: 200
+// 	});
+// }
+import { callPublic } from "../../lib/api/callPublic";
 import { cookies } from "next/headers";
 
-//https ignore file
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 export async function POST(req: Request) {
+	const cookieStore = await cookies();
 	const body = await req.json();
 
-	const res = await fetch("https://backend:5000/mod/login", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(body)
-	});
+	try {
+		const data = await callPublic({ route: "mod/login", method: "POST", payload: body });
+		cookieStore.set("token", data.token, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "strict",
+			path: "/",
+			maxAge: 60 * 60 * 24, // 1 days
+		});
 
-	const text = await res.text();
-	const data = text ? JSON.parse(text) : {};
-
-	if (!res.ok) {
-		return new Response(JSON.stringify(data), {
-			status: res.status
+		return new Response(JSON.stringify({ success: true }), {
+			status: 200
+		});
+	} catch (error: any) {
+		return new Response(JSON.stringify({ message: error.message }), {
+			status: 500
 		});
 	}
-
-	//JWT on cookies
-	const cookieStore = await cookies();
-
-	cookieStore.set("token", data.token, {
-		httpOnly: true,
-		secure: true,
-		sameSite: "strict",
-		path: "/",
-		maxAge: 60 * 60 * 24, // 1 days
-	});
-
-	return new Response(JSON.stringify({ success: true }), {
-		status: 200
-	});
 }

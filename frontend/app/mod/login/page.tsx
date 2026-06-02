@@ -7,7 +7,7 @@ export const metadata = {
 }
 
 export default async function ModLogin() {
-	const isLoggedIn = await CheckLogin(1, false);
+	const isLoggedIn = await CheckLogin("mod", false);
 	if (isLoggedIn)
 		redirect("/mod/dashboard");
 

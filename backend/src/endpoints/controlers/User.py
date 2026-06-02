@@ -15,7 +15,9 @@ class UserController:
   
 	@classmethod
 	def get_private_routes(cls):
-		return []
+		return [
+			("/user/checkToken", cls._check_token, ["GET"], "check_token"),
+		]
 
 	# @staticmethod
 	# def register_validator():
@@ -40,6 +42,32 @@ class UserController:
 	# 		return jsonify({"error": "Weak password."}), 400
       
 	# 	return data, None
+
+	@staticmethod
+	def _check_token():
+		user = g.user
+
+		if not user:
+			return jsonify({"error": "Invalid token."}), 401
+		
+		try:
+			checkUser = Database.run_query(
+				"""
+				SELECT username
+				FROM users
+				WHERE public_id = %s
+				""",
+				(user.get("public_id")),
+				fetch_one=True
+			)
+			if not checkUser:
+				return jsonify({"error": "Invalid token."}), 401
+			
+			return jsonify({"message": "Token is valid."}), 200
+		except Exception:
+			return jsonify({"error": "Failed to check token."}), 400
+
+
 
 	@staticmethod
 	def _register():

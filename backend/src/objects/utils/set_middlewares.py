@@ -105,6 +105,8 @@ def set_middlewares(app, pub_routes):
                 "required_fields": ["username", "password", "email", "role"],
                 "optional_fields": {}
             },
+            "/mod/checkToken": None,  # No validation needed for check token since it just checks the token
+            "/user/checkToken": None,  # No validation needed for check token since it just checks the token
         }
 
         route = request.path

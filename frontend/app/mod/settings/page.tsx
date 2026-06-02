@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 export default async function ModSettingsPage() {
-	await CheckLogin(1);
+	await CheckLogin("mod");
 
 	return <ModSettingsComponent />;
 }
